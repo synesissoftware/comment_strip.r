@@ -37,7 +37,7 @@
 # ######################################################################## #
 
 
-require 'comment_strip/comment_strip'
+require File.join(File.dirname(__FILE__), 'comment_strip', 'comment_strip')
 
 # ############################## end of file ############################# #
 

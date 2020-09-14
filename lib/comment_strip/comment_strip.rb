@@ -37,8 +37,7 @@
 # ######################################################################## #
 
 
-require 'comment_strip/comment_strip'
-require 'comment_strip/version'
+require File.join(File.dirname(__FILE__), 'version')
 
 =begin
 =end
