@@ -2805,6 +2805,58 @@ EOF_main
 
         assert_equal expected, actual
     end
+
+    def test_real_sample_7
+
+        input = <<-EOF_main
+#if defined(RECLS_CPP_NO_METHOD_PROPERTY_SUPPORT)
+ /* Do not define RECLS_CPP_METHOD_PROPERTY_SUPPORT */
+#else /* ? RECLS_CPP_???_METHOD_PROPERTY_SUPPORT */
+# elif defined(STLSOFT_COMPILER_IS_DMC)
+#  if __DMC__ >= 0x0846
+#   define RECLS_CPP_METHOD_PROPERTY_SUPPORT */
+#  endif /* __DMC__ */
+# elif defined(STLSOFT_COMPILER_IS_GCC)
+ /* Do not define RECLS_CPP_METHOD_PROPERTY_SUPPORT */
+# elif defined(STLSOFT_COMPILER_IS_INTEL)
+#  define RECLS_CPP_METHOD_PROPERTY_SUPPORT
+# elif defined(STLSOFT_COMPILER_IS_MSVC)
+#  if _MSC_VER >= 1310
+#   define RECLS_CPP_METHOD_PROPERTY_SUPPORT
+#  endif /* _MSC_VER */
+# elif defined(STLSOFT_COMPILER_IS_MWERKS)
+#  define RECLS_CPP_METHOD_PROPERTY_SUPPORT
+# endif /* compiler */
+#endif /* RECLS_CPP_???_METHOD_PROPERTY_SUPPORT */
+
+EOF_main
+        expected = <<-EOF_main
+#if defined(RECLS_CPP_NO_METHOD_PROPERTY_SUPPORT)
+ 
+#else 
+# elif defined(STLSOFT_COMPILER_IS_DMC)
+#  if __DMC__ >= 0x0846
+#   define RECLS_CPP_METHOD_PROPERTY_SUPPORT */
+#  endif 
+# elif defined(STLSOFT_COMPILER_IS_GCC)
+ 
+# elif defined(STLSOFT_COMPILER_IS_INTEL)
+#  define RECLS_CPP_METHOD_PROPERTY_SUPPORT
+# elif defined(STLSOFT_COMPILER_IS_MSVC)
+#  if _MSC_VER >= 1310
+#   define RECLS_CPP_METHOD_PROPERTY_SUPPORT
+#  endif 
+# elif defined(STLSOFT_COMPILER_IS_MWERKS)
+#  define RECLS_CPP_METHOD_PROPERTY_SUPPORT
+# endif 
+#endif 
+
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
 end
 
 # ############################## end of file ############################# #

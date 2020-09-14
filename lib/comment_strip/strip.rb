@@ -96,6 +96,11 @@ def strip s, lf, *options
             when :sq_string, :sq_string_escape, :sq_string_closing
 
                 state = :text
+            when :slash_start
+
+                r << '/'
+
+                state = :text
             end
         else
 
