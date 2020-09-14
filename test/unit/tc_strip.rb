@@ -204,6 +204,22 @@ EOF_main
         assert_equal expected, actual
     end
 
+    def test_code_with_single_quoted_characters_6
+
+        input = <<-EOF_main
+
+#define SOME_CHAR '\\x80' /* some char */
+EOF_main
+        expected = <<-EOF_main
+
+#define SOME_CHAR '\\x80' 
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
     def test_code_with_double_quoted_characters_1
 
         input = <<-EOF_main
