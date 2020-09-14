@@ -125,13 +125,17 @@ def strip s, lf, *options
                 state = :dq_string
             when :c_comment_star
 
-                if ?/ == c
+                case c
+                when ?/
 
                     r << ?\n * cc_lines
                     cc_lines = 0
 
                     state = :text
                     skip = true
+                when '*'
+
+                    ;
                 else
 
                     state = :c_comment
