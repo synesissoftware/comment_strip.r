@@ -65,90 +65,156 @@ def strip s, lf, *options
 
     r       =   ''
 
-    c_lines =   0
+    cc_lines =   0
 
     s.each_char do |c|
-
-        skip = false
 
         case c
         when ?\r, ?\n
 
             line += 1
             column = 0
+        else
+
+            column += 1
+        end
+
+        skip = false
+
+        case c
+        when ?\r, ?\n
 
             case state
             when :c_comment, :c_comment_star
 
-                c_lines += 1
+                cc_lines += 1
 
                 state = :c_comment
-            end
-
-            case state
             when :cpp_comment
+
+                state = :text
+            when :sq_string, :sq_string_escape, :sq_string_closing
 
                 state = :text
             end
         else
 
-            column += 1
+            # special cases:
+            #
+            # - for escaped single/double quote
+            # - for slash-start
+            # - for comment-star
 
-            case c
-            when '/'
+            case state
+            when :sq_string_open
 
-                case state
-                when :text
+                state = (?\\ == c) ? :sq_string_escape : :sq_string_closing
+            when :sq_string_escape
 
-                    state = :slash_start
-                when :slash_start
+                state = :sq_string_closing
+            when :dq_string_escape
 
-                    state = :cpp_comment
-                when :c_comment_star
+                state = :dq_string_closing
+            when :c_comment_star
 
-                    r << ?\n * c_lines
-                    c_lines = 0
+                if ?/ == c
+
+                    r << ?\n * cc_lines
+                    cc_lines = 0
 
                     state = :text
                     skip = true
-                end
-            when '*'
-
-                case state
-                when :slash_start
-
-                    state = :c_comment
-                when :c_comment
-
-                    state = :c_comment_star
                 else
 
+                    state = :c_comment
                 end
             else
 
-                case state
-                when :slash_start
+                if false
+                elsif state == :slash_start && ('/' != c && '*' != c)
 
                     state = :text
                     r << '/'
-                when :c_comment_star
-
-                    state = :c_comment
                 else
 
-                end
+                    case c
+                    when '/'
 
-                case c
-                when '"'
+                        case state
+                        when :text
 
-                    case state
-                    when :text
+                            state = :slash_start
+                        when :slash_start
 
-                        state = :dq_string
-                    when :dq_string
+                            state = :cpp_comment
+                        when :c_comment_star
 
-                        state = :text
+                            r << ?\n * cc_lines
+                            cc_lines = 0
+
+                            state = :text
+                            skip = true
+                        end
+                    when '*'
+
+                        case state
+                        when :slash_start
+
+                            state = :c_comment
+                        when :c_comment
+
+                            state = :c_comment_star
+                        else
+
+                        end
+
+                    when ?\'
+
+                        case state
+                        when :text
+
+                            state = :sq_string_open
+                        when :sq_string_closing
+
+                            state = :text
+                        else
+
+                        end
+                    when '"'
+
+                        case state
+                        when :text
+
+                            state = :dq_string
+                        when :dq_string
+
+                            state = :text
+                        else
+                        end
+                    when ?\\
+
+                        case state
+                        when :sq_string_open
+
+                            state = :sq_string_escape
+                        when :sq_string_quoted
+
+                            state = :sq_string
+                        when :dq_string
+
+                            state = :dq_string_quoted
+                        else
+
+                        end
                     else
+
+                        case state
+                        when :sq_string_quoted
+
+                            state = :sq_string_closing
+                        else
+
+                        end
                     end
                 end
             end
