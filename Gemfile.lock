@@ -1,0 +1,21 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    clasp-ruby (0.22.0.1)
+    libclimate-ruby (0.15.0)
+      clasp-ruby (~> 0.21)
+      xqsr3 (~> 0.33)
+    recls-ruby (2.11.0)
+    xqsr3 (0.36.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  clasp-ruby (~> 0.21)
+  libclimate-ruby (~> 0.15)
+  recls-ruby (~> 2)
+  xqsr3 (~> 0.36)
+
+BUNDLED WITH
+   2.1.4
