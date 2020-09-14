@@ -65,6 +65,8 @@ def strip s, lf, *options
 
     r       =   ''
 
+    c_lines =   0
+
     s.each_char do |c|
 
         skip = false
@@ -74,6 +76,8 @@ def strip s, lf, *options
 
             line += 1
             column = 0
+
+            c_lines += 1 if state == :c_comment
 
             case state
             when :cpp_comment
@@ -95,6 +99,9 @@ def strip s, lf, *options
 
                     state = :cpp_comment
                 when :c_comment_star
+
+                    r << ?\n * c_lines
+                    c_lines = 0
 
                     state = :text
                     skip = true

@@ -43,7 +43,7 @@
 module CommentStrip
 
     # Current version of the comment_strip.r library
-    VERSION                 =   '0.0.3'
+    VERSION                 =   '0.0.4'
 
     private
     VERSION_PARTS_          =   VERSION.split(/[.]/).collect { |n| n.to_i } # :nodoc:

@@ -117,6 +117,55 @@ EOF_main
 
         assert_equal expected, strip(input, 'C')
     end
+
+    def test_ccomment_inline
+
+        input = 'int i = func(/*x=*/x, /*y=*/y);'
+        expected = 'int i = func(x, y);'
+
+        assert_equal expected, strip(input, 'C')
+    end
+
+    def test_multiline_1
+
+        input = <<-EOF_main
+
+/** Some function description
+ */
+int func();
+EOF_main
+        expected = <<-EOF_main
+
+
+int func();
+EOF_main
+
+        assert_equal expected, strip(input, 'C')
+    end
+
+    def test_multiline_2
+
+        input = <<-EOF_main
+
+/** Some function description
+ */
+int func();
+
+/** Some other function description
+ */
+int fn();
+EOF_main
+        expected = <<-EOF_main
+
+
+int func();
+
+
+int fn();
+EOF_main
+
+        assert_equal expected, strip(input, 'C')
+    end
 end
 
 # ############################## end of file ############################# #
