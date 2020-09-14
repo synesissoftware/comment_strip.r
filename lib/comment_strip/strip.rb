@@ -135,6 +135,20 @@ def strip s, lf, *options
                 else
 
                 end
+
+                case c
+                when '"'
+
+                    case state
+                    when :text
+
+                        state = :dq_string
+                    when :dq_string
+
+                        state = :text
+                    else
+                    end
+                end
             end
         end
 

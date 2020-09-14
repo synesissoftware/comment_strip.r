@@ -174,6 +174,36 @@ EOF_main
         assert_equal expected, strip(input, 'C')
     end
 
+    def test_comments_in_strings_1
+
+        input = <<-EOF_main
+
+        string s("//"); // THIS is the comment
+EOF_main
+        expected = <<-EOF_main
+
+        string s("//"); 
+EOF_main
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_comments_in_strings_2
+
+        input = <<-EOF_main
+
+        string s("/*"); // THIS is the comment
+EOF_main
+        expected = <<-EOF_main
+
+        string s("/*"); 
+EOF_main
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
     def test_real_sample_1
 
         input = <<-EOF_main
@@ -238,8 +268,9 @@ EOF_main
 # pragma warning(disable : 4702) 
 #endif 
 EOF_main
+        actual = strip(input, 'C')
 
-        assert_equal expected, strip(input, 'C')
+        assert_equal expected, actual
     end
 
     def test_real_sample_2
