@@ -37,6 +37,7 @@
 # ######################################################################## #
 
 
+require 'comment_strip/comment_strip'
 require 'comment_strip/version'
 
 =begin
