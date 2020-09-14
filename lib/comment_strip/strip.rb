@@ -1,7 +1,7 @@
 # ######################################################################## #
-# File:         comment_strip.rb
+# File:         comment_strip/strip.rb
 #
-# Purpose:      Top-level include for comment_strip.r library
+# Purpose:      Definition of strip() function
 #
 # Created:      14th September 2020
 # Updated:      14th September 2020
@@ -37,10 +37,109 @@
 # ######################################################################## #
 
 
+
 =begin
 =end
 
-require File.join(File.dirname(__FILE__), 'comment_strip', 'comment_strip')
+module CommentStrip
+
+# Strips comments
+def strip s, lf, *options
+
+    case lf.upcase
+    when 'C'
+
+        ;
+    else
+
+        raise "language family '#{lf}' unrecognised"
+    end
+
+    return nil if s.nil?
+    return s if s.empty?
+
+    line    =   0
+    column  =   0
+
+    state   =   :text
+
+    r       =   ''
+
+    s.each_char do |c|
+
+        skip = false
+
+        case c
+        when ?\r, ?\n
+
+            line += 1
+            column = 0
+
+            case state
+            when :cpp_comment
+
+                state = :text
+            end
+        else
+
+            column += 1
+
+            case c
+            when '/'
+
+                case state
+                when :text
+
+                    state = :slash_start
+                when :slash_start
+
+                    state = :cpp_comment
+                when :c_comment_star
+
+                    state = :text
+                    skip = true
+                end
+            when '*'
+
+                case state
+                when :slash_start
+
+                    state = :c_comment
+                when :c_comment
+
+                    state = :c_comment_star
+                else
+
+                end
+            else
+
+                case state
+                when :slash_start
+
+                    state = :text
+                    r << '/'
+                else
+
+                end
+            end
+        end
+
+        case state
+        when :slash_start
+        when :cpp_comment
+        when :c_comment
+        when :c_comment_star
+
+        else
+
+            r << c unless skip
+        end
+    end
+
+    r
+end
+
+end # module CommentStrip
 
 # ############################## end of file ############################# #
 

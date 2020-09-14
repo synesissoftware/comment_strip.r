@@ -37,6 +37,7 @@
 # ######################################################################## #
 
 
+require File.join(File.dirname(__FILE__), 'strip')
 require File.join(File.dirname(__FILE__), 'version')
 
 =begin
