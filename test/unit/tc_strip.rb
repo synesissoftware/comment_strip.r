@@ -58,6 +58,40 @@ EOF_main
         assert_equal expected, strip(input, 'C')
     end
 
+    def test_
+
+        input = <<-EOF_main
+#ifdef CLARA_PLATFORM_WINDOWS
+                case '/': from = i+1; return SlashOpt;
+#endif
+
+        std::string description;
+        std::string detail;
+        std::string placeholder; // Only value if boundField takes an arg
+
+        bool takesArg() const {
+            return !placeholder.empty();
+        }
+EOF_main
+        expected = <<-EOF_main
+#ifdef CLARA_PLATFORM_WINDOWS
+                case '/': from = i+1; return SlashOpt;
+#endif
+
+        std::string description;
+        std::string detail;
+        std::string placeholder; 
+
+        bool takesArg() const {
+            return !placeholder.empty();
+        }
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
     def test_simple_main_with_trailing_cppcomment
 
         input = <<-EOF_main
@@ -1960,6 +1994,106 @@ EOF_main
 
         assert_equal expected, strip(input, 'C')
     end
+
+    def test_real_sample_5
+
+        input = <<-EOF_main
+/*****************************************************************************
+/*                             Start of crcmodel.c                            
+/*****************************************************************************
+/*                                                                            
+/* Author : Ross Williams (ross@guest.adelaide.edu.au.).                      
+/* Date   : 3 June 1993.                                                      
+/* Status : Public domain.                                                    
+/*                                                                            
+/* Description : This is the implementation (.c) file for the reference       
+/* implementation of the Rocksoft^tm Model CRC Algorithm. For more            
+/* information on the Rocksoft^tm Model CRC Algorithm, see the document       
+/* titled "A Painless Guide to CRC Error Detection Algorithms" by Ross        
+/* Williams (ross@guest.adelaide.edu.au.). This document is likely to be in   
+/* "ftp.adelaide.edu.au/pub/rocksoft".                                        
+/*                                                                            
+/* Note: Rocksoft is a trademark of Rocksoft Pty Ltd, Adelaide, Australia.    
+/*                                                                            
+/*****************************************************************************
+/*                                                                            
+/* Implementation Notes                                                       
+/* --------------------                                                       
+/* To avoid inconsistencies, the specification of each function is not echoed 
+/* here. See the header file for a description of these functions.            
+/* This package is light on checking because I want to keep it short and      
+/* simple and portable (i.e. it would be too messy to distribute my entire    
+/* C culture (e.g. assertions package) with this package.                     
+/*                                                                            */
+/******************************************************************************/
+
+#include "crcmodel.h"
+
+/******************************************************************************/
+
+/* The following definitions make the code more readable. */
+
+#define BITMASK(X) (1L << (X))
+#define MASK32 0xFFFFFFFFL
+#define LOCAL static
+
+/******************************************************************************/
+
+LOCAL ulong reflect (ulong v, int b)
+/* Returns the value v with the bottom b [0,32] bits reflected. */
+/* Example: reflect(0x3e23L,3) == 0x3e26                        */
+EOF_main
+        expected = <<-EOF_main
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include "crcmodel.h"
+
+
+
+
+
+#define BITMASK(X) (1L << (X))
+#define MASK32 0xFFFFFFFFL
+#define LOCAL static
+
+
+
+LOCAL ulong reflect (ulong v, int b)
+
+
+EOF_main
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
 end
 
 # ############################## end of file ############################# #

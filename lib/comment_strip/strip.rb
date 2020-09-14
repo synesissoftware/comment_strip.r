@@ -81,6 +81,8 @@ def strip s, lf, *options
             when :c_comment, :c_comment_star
 
                 c_lines += 1
+
+                state = :c_comment
             end
 
             case state
