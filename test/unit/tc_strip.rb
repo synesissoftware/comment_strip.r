@@ -58,7 +58,7 @@ EOF_main
         assert_equal expected, strip(input, 'C')
     end
 
-    def test_
+    def test_x_1
 
         input = <<-EOF_main
 #ifdef CLARA_PLATFORM_WINDOWS
@@ -85,6 +85,38 @@ EOF_main
         bool takesArg() const {
             return !placeholder.empty();
         }
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_x_2
+
+        input = <<-EOF_main
+
+} // namespace something
+EOF_main
+        expected = <<-EOF_main
+
+} 
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_x_3
+
+        input = <<-EOF_main
+
+#endif /* !LOG_PERROR */
+EOF_main
+        expected = <<-EOF_main
+
+#endif 
 EOF_main
 
         actual = strip(input, 'C')
@@ -2850,6 +2882,596 @@ EOF_main
 #  define RECLS_CPP_METHOD_PROPERTY_SUPPORT
 # endif 
 #endif 
+
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_real_sample_8
+
+        input = <<-EOF_main
+/*****************************************************************************
+/*                             Start of crcmodel.c                            
+/*****************************************************************************
+/*                                                                            
+/* Author : Ross Williams (ross@guest.adelaide.edu.au.).                      
+/* Date   : 3 June 1993.                                                      
+/* Status : Public domain.                                                    
+/*                                                                            
+/* Description : This is the implementation (.c) file for the reference       
+/* implementation of the Rocksoft^tm Model CRC Algorithm. For more            
+/* information on the Rocksoft^tm Model CRC Algorithm, see the document       
+/* titled "A Painless Guide to CRC Error Detection Algorithms" by Ross        
+/* Williams (ross@guest.adelaide.edu.au.). This document is likely to be in   
+/* "ftp.adelaide.edu.au/pub/rocksoft".                                        
+/*                                                                            
+/* Note: Rocksoft is a trademark of Rocksoft Pty Ltd, Adelaide, Australia.    
+/*                                                                            
+/*****************************************************************************
+/*                                                                            
+/* Implementation Notes                                                       
+/* --------------------                                                       
+/* To avoid inconsistencies, the specification of each function is not echoed 
+/* here. See the header file for a description of these functions.            
+/* This package is light on checking because I want to keep it short and      
+/* simple and portable (i.e. it would be too messy to distribute my entire    
+/* C culture (e.g. assertions package) with this package.                     
+/*                                                                            */
+/******************************************************************************/
+
+#include "crcmodel.h"
+
+/******************************************************************************/
+
+/* The following definitions make the code more readable. */
+
+#define BITMASK(X) (1L << (X))
+#define MASK32 0xFFFFFFFFL
+#define LOCAL static
+
+/******************************************************************************/
+
+LOCAL ulong reflect (ulong v, int b)
+/* Returns the value v with the bottom b [0,32] bits reflected. */
+/* Example: reflect(0x3e23L,3) == 0x3e26                        */
+{
+	int   i;
+	ulong t = v;
+	for (i=0; i<b; i++)
+	{
+		if (t & 1L)
+			v|=  BITMASK((b-1)-i);
+		else
+			v&= ~BITMASK((b-1)-i);
+		t>>=1;
+	}
+	return v;
+}
+
+/******************************************************************************/
+
+LOCAL ulong widmask (p_cm_t p_cm)
+/* Returns a longword whose value is (2^p_cm->cm_width)-1.     */
+/* The trick is to do this portably (e.g. without doing <<32). */
+{
+	return (((1L<<(p_cm->cm_width-1))-1L)<<1)|1L;
+}
+
+/******************************************************************************/
+
+void cm_ini (p_cm_t p_cm)
+{
+	p_cm->cm_reg = p_cm->cm_init;
+}
+
+/******************************************************************************/
+
+void cm_nxt (p_cm_t p_cm, int ch)
+{
+	int   i;
+	ulong uch  = (ulong) ch;
+	ulong topbit = BITMASK(p_cm->cm_width-1);
+
+	if (p_cm->cm_refin)
+		uch = reflect(uch,8);
+
+	p_cm->cm_reg ^= (uch << (p_cm->cm_width-8));
+	for (i=0; i<8; i++)
+	{
+		if (p_cm->cm_reg & topbit)
+			p_cm->cm_reg = (p_cm->cm_reg << 1) ^ p_cm->cm_poly;
+		else
+			p_cm->cm_reg <<= 1;
+
+		p_cm->cm_reg &= widmask(p_cm);
+	}
+}
+
+/******************************************************************************/
+
+void cm_blk (p_cm_t p_cm, p_ubyte_ blk_adr, ulong blk_len)
+{
+	while (blk_len--)
+		cm_nxt(p_cm,*blk_adr++);
+}
+
+/******************************************************************************/
+
+ulong cm_crc (p_cm_t p_cm)
+{
+	if (p_cm->cm_refot)
+		return p_cm->cm_xorot ^ reflect(p_cm->cm_reg,p_cm->cm_width);
+	else
+		return p_cm->cm_xorot ^ p_cm->cm_reg;
+}
+
+/******************************************************************************/
+
+ulong cm_tab (p_cm_t p_cm, int index)
+{
+	int   i;
+	ulong r;
+	ulong topbit = BITMASK(p_cm->cm_width-1);
+	ulong inbyte = (ulong) index;
+
+	if (p_cm->cm_refin)
+		inbyte = reflect(inbyte,8);
+
+	r = inbyte << (p_cm->cm_width-8);
+	for (i=0; i<8; i++)
+	{
+		if (r & topbit)
+			r = (r << 1) ^ p_cm->cm_poly;
+		else
+			r<<=1;
+	}
+	if (p_cm->cm_refin)
+		r = reflect(r,p_cm->cm_width);
+	return r & widmask(p_cm);
+}
+
+/******************************************************************************/
+/*                             End of crcmodel.c                              */
+/******************************************************************************/
+EOF_main
+        expected = <<-EOF_main
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include "crcmodel.h"
+
+
+
+
+
+#define BITMASK(X) (1L << (X))
+#define MASK32 0xFFFFFFFFL
+#define LOCAL static
+
+
+
+LOCAL ulong reflect (ulong v, int b)
+
+
+{
+	int   i;
+	ulong t = v;
+	for (i=0; i<b; i++)
+	{
+		if (t & 1L)
+			v|=  BITMASK((b-1)-i);
+		else
+			v&= ~BITMASK((b-1)-i);
+		t>>=1;
+	}
+	return v;
+}
+
+
+
+LOCAL ulong widmask (p_cm_t p_cm)
+
+
+{
+	return (((1L<<(p_cm->cm_width-1))-1L)<<1)|1L;
+}
+
+
+
+void cm_ini (p_cm_t p_cm)
+{
+	p_cm->cm_reg = p_cm->cm_init;
+}
+
+
+
+void cm_nxt (p_cm_t p_cm, int ch)
+{
+	int   i;
+	ulong uch  = (ulong) ch;
+	ulong topbit = BITMASK(p_cm->cm_width-1);
+
+	if (p_cm->cm_refin)
+		uch = reflect(uch,8);
+
+	p_cm->cm_reg ^= (uch << (p_cm->cm_width-8));
+	for (i=0; i<8; i++)
+	{
+		if (p_cm->cm_reg & topbit)
+			p_cm->cm_reg = (p_cm->cm_reg << 1) ^ p_cm->cm_poly;
+		else
+			p_cm->cm_reg <<= 1;
+
+		p_cm->cm_reg &= widmask(p_cm);
+	}
+}
+
+
+
+void cm_blk (p_cm_t p_cm, p_ubyte_ blk_adr, ulong blk_len)
+{
+	while (blk_len--)
+		cm_nxt(p_cm,*blk_adr++);
+}
+
+
+
+ulong cm_crc (p_cm_t p_cm)
+{
+	if (p_cm->cm_refot)
+		return p_cm->cm_xorot ^ reflect(p_cm->cm_reg,p_cm->cm_width);
+	else
+		return p_cm->cm_xorot ^ p_cm->cm_reg;
+}
+
+
+
+ulong cm_tab (p_cm_t p_cm, int index)
+{
+	int   i;
+	ulong r;
+	ulong topbit = BITMASK(p_cm->cm_width-1);
+	ulong inbyte = (ulong) index;
+
+	if (p_cm->cm_refin)
+		inbyte = reflect(inbyte,8);
+
+	r = inbyte << (p_cm->cm_width-8);
+	for (i=0; i<8; i++)
+	{
+		if (r & topbit)
+			r = (r << 1) ^ p_cm->cm_poly;
+		else
+			r<<=1;
+	}
+	if (p_cm->cm_refin)
+		r = reflect(r,p_cm->cm_width);
+	return r & widmask(p_cm);
+}
+
+
+
+
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_real_sample_9
+
+        input = <<-EOF_main
+/*
+ * This source file is part of the bstring string library.  This code was
+ * written by Paul Hsieh in 2002-2010, and is covered by either the 3-clause 
+ * BSD open source license or GPL v2.0. Refer to the accompanying documentation 
+ * for details on usage and license.
+ */
+
+/*
+ * bstest.c
+ *
+ * This file is the C unit test for Bstrlib.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <limits.h>
+#include <ctype.h>
+#include "bstrlib.h"
+#include "bstraux.h"
+
+static bstring dumpOut[16];
+static int rot = 0;
+
+static char * dumpBstring (const struct tagbstring * b) {
+	rot = (rot + 1) % (unsigned)16;
+	if (dumpOut[rot] == NULL) {
+		dumpOut[rot] = bfromcstr ("");
+		if (dumpOut[rot] == NULL) return "FATAL INTERNAL ERROR";
+	}
+	dumpOut[rot]->slen = 0;
+	if (b == NULL) {
+		bcatcstr (dumpOut[rot], "NULL");
+	} else {
+		static char msg[256];
+		sprintf (msg, "%p", (void *)b);
+		bcatcstr (dumpOut[rot], msg);
+
+		if (b->slen < 0) {
+			sprintf (msg, ":[err:slen=%d<0]", b->slen);
+			bcatcstr (dumpOut[rot], msg);
+		} else {
+			if (b->mlen > 0 && b->mlen < b->slen) {
+				sprintf (msg, ":[err:mlen=%d<slen=%d]", b->mlen, b->slen);
+				bcatcstr (dumpOut[rot], msg);
+			} else {
+				if (b->mlen == -1) {
+					bcatcstr (dumpOut[rot], "[p]");
+				} else if (b->mlen < 0) {
+					bcatcstr (dumpOut[rot], "[c]");
+				}
+				bcatcstr (dumpOut[rot], ":");
+				if (b->data == NULL) {
+					bcatcstr (dumpOut[rot], "[err:data=NULL]");
+				} else {
+					bcatcstr (dumpOut[rot], "\"");
+					bcatcstr (dumpOut[rot], (const char *) b->data);
+					bcatcstr (dumpOut[rot], "\"");
+				}
+			}
+		}
+	}
+	return (char *) dumpOut[rot]->data;
+}
+
+static int test0_0 (const char * s, const char * res) {
+bstring b0 = bfromcstr (s);
+int ret = 0;
+
+	if (s == NULL) {
+		if (res != NULL) ret++;
+		printf (".\tbfromcstr (NULL) = %s\n", dumpBstring (b0));
+		return ret;
+	}
+
+	ret += (res == NULL) || ((int) strlen (res) != b0->slen)
+	       || (0 != memcmp (res, b0->data, b0->slen));
+	ret += b0->data[b0->slen] != '\0';
+
+	printf (".\tbfromcstr (\"%s\") = %s\n", s, dumpBstring (b0));
+	bdestroy (b0);
+	return ret;
+}
+
+static int test0_1 (const char * s, int len, const char * res) {
+bstring b0 = bfromcstralloc (len, s);
+int ret = 0;
+
+	if (s == NULL) {
+		if (res != NULL) ret++;
+		printf (".\tbfromcstralloc (*, NULL) = %s\n", dumpBstring (b0));
+		return ret;
+	}
+
+	ret += (res == NULL) || ((int) strlen (res) != b0->slen)
+	       || (0 != memcmp (res, b0->data, b0->slen));
+	ret += b0->data[b0->slen] != '\0';
+	ret += len > b0->mlen;
+
+	printf (".\tbfromcstralloc (%d, \"%s\") = %s\n", len, s, dumpBstring (b0));
+	bdestroy (b0);
+	return ret;
+}
+
+#define EMPTY_STRING ""
+#define SHORT_STRING "bogus"
+#define LONG_STRING  "This is a bogus but reasonably long string.  Just long enough to cause some mallocing."
+
+static int test0 (void) {
+int ret = 0;
+
+	printf ("TEST: bstring bfromcstr (const char * str);\n");
+
+	/* tests with NULL */
+	ret += test0_0 (NULL, NULL);
+
+	/* normal operation tests */
+	ret += test0_0 (EMPTY_STRING, EMPTY_STRING);
+	ret += test0_0 (SHORT_STRING, SHORT_STRING);
+	ret += test0_0 (LONG_STRING, LONG_STRING);
+	printf ("\t# failures: %d\n", ret);
+
+	printf ("TEST: bstring bfromcstralloc (int len, const char * str);\n");
+
+	/* tests with NULL */
+	ret += test0_1 (NULL,  0, NULL);
+	ret += test0_1 (NULL, 30, NULL);
+
+	/* normal operation tests */
+	ret += test0_1 (EMPTY_STRING,  0, EMPTY_STRING);
+	ret += test0_1 (EMPTY_STRING, 30, EMPTY_STRING);
+	ret += test0_1 (SHORT_STRING,  0, SHORT_STRING);
+	ret += test0_1 (SHORT_STRING, 30, SHORT_STRING);
+	ret += test0_1 ( LONG_STRING,  0,  LONG_STRING);
+	ret += test0_1 ( LONG_STRING, 30,  LONG_STRING);
+	printf ("\t# failures: %d\n", ret);
+
+	return ret;
+}
+
+EOF_main
+        expected = <<-EOF_main
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <limits.h>
+#include <ctype.h>
+#include "bstrlib.h"
+#include "bstraux.h"
+
+static bstring dumpOut[16];
+static int rot = 0;
+
+static char * dumpBstring (const struct tagbstring * b) {
+	rot = (rot + 1) % (unsigned)16;
+	if (dumpOut[rot] == NULL) {
+		dumpOut[rot] = bfromcstr ("");
+		if (dumpOut[rot] == NULL) return "FATAL INTERNAL ERROR";
+	}
+	dumpOut[rot]->slen = 0;
+	if (b == NULL) {
+		bcatcstr (dumpOut[rot], "NULL");
+	} else {
+		static char msg[256];
+		sprintf (msg, "%p", (void *)b);
+		bcatcstr (dumpOut[rot], msg);
+
+		if (b->slen < 0) {
+			sprintf (msg, ":[err:slen=%d<0]", b->slen);
+			bcatcstr (dumpOut[rot], msg);
+		} else {
+			if (b->mlen > 0 && b->mlen < b->slen) {
+				sprintf (msg, ":[err:mlen=%d<slen=%d]", b->mlen, b->slen);
+				bcatcstr (dumpOut[rot], msg);
+			} else {
+				if (b->mlen == -1) {
+					bcatcstr (dumpOut[rot], "[p]");
+				} else if (b->mlen < 0) {
+					bcatcstr (dumpOut[rot], "[c]");
+				}
+				bcatcstr (dumpOut[rot], ":");
+				if (b->data == NULL) {
+					bcatcstr (dumpOut[rot], "[err:data=NULL]");
+				} else {
+					bcatcstr (dumpOut[rot], "\"");
+					bcatcstr (dumpOut[rot], (const char *) b->data);
+					bcatcstr (dumpOut[rot], "\"");
+				}
+			}
+		}
+	}
+	return (char *) dumpOut[rot]->data;
+}
+
+static int test0_0 (const char * s, const char * res) {
+bstring b0 = bfromcstr (s);
+int ret = 0;
+
+	if (s == NULL) {
+		if (res != NULL) ret++;
+		printf (".\tbfromcstr (NULL) = %s\n", dumpBstring (b0));
+		return ret;
+	}
+
+	ret += (res == NULL) || ((int) strlen (res) != b0->slen)
+	       || (0 != memcmp (res, b0->data, b0->slen));
+	ret += b0->data[b0->slen] != '\0';
+
+	printf (".\tbfromcstr (\"%s\") = %s\n", s, dumpBstring (b0));
+	bdestroy (b0);
+	return ret;
+}
+
+static int test0_1 (const char * s, int len, const char * res) {
+bstring b0 = bfromcstralloc (len, s);
+int ret = 0;
+
+	if (s == NULL) {
+		if (res != NULL) ret++;
+		printf (".\tbfromcstralloc (*, NULL) = %s\n", dumpBstring (b0));
+		return ret;
+	}
+
+	ret += (res == NULL) || ((int) strlen (res) != b0->slen)
+	       || (0 != memcmp (res, b0->data, b0->slen));
+	ret += b0->data[b0->slen] != '\0';
+	ret += len > b0->mlen;
+
+	printf (".\tbfromcstralloc (%d, \"%s\") = %s\n", len, s, dumpBstring (b0));
+	bdestroy (b0);
+	return ret;
+}
+
+#define EMPTY_STRING ""
+#define SHORT_STRING "bogus"
+#define LONG_STRING  "This is a bogus but reasonably long string.  Just long enough to cause some mallocing."
+
+static int test0 (void) {
+int ret = 0;
+
+	printf ("TEST: bstring bfromcstr (const char * str);\n");
+
+	
+	ret += test0_0 (NULL, NULL);
+
+	
+	ret += test0_0 (EMPTY_STRING, EMPTY_STRING);
+	ret += test0_0 (SHORT_STRING, SHORT_STRING);
+	ret += test0_0 (LONG_STRING, LONG_STRING);
+	printf ("\t# failures: %d\n", ret);
+
+	printf ("TEST: bstring bfromcstralloc (int len, const char * str);\n");
+
+	
+	ret += test0_1 (NULL,  0, NULL);
+	ret += test0_1 (NULL, 30, NULL);
+
+	
+	ret += test0_1 (EMPTY_STRING,  0, EMPTY_STRING);
+	ret += test0_1 (EMPTY_STRING, 30, EMPTY_STRING);
+	ret += test0_1 (SHORT_STRING,  0, SHORT_STRING);
+	ret += test0_1 (SHORT_STRING, 30, SHORT_STRING);
+	ret += test0_1 ( LONG_STRING,  0,  LONG_STRING);
+	ret += test0_1 ( LONG_STRING, 30,  LONG_STRING);
+	printf ("\t# failures: %d\n", ret);
+
+	return ret;
+}
 
 EOF_main
 
