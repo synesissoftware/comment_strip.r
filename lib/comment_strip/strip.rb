@@ -77,7 +77,11 @@ def strip s, lf, *options
             line += 1
             column = 0
 
-            c_lines += 1 if state == :c_comment
+            case state
+            when :c_comment, :c_comment_star
+
+                c_lines += 1
+            end
 
             case state
             when :cpp_comment
@@ -125,6 +129,9 @@ def strip s, lf, *options
 
                     state = :text
                     r << '/'
+                when :c_comment_star
+
+                    state = :c_comment
                 else
 
                 end
