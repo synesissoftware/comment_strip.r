@@ -96,6 +96,9 @@ def strip s, lf, *options
             when :sq_string, :sq_string_escape, :sq_string_closing
 
                 state = :text
+            when :dq_string_escape
+
+                state = :dq_string
             when :slash_start
 
                 r << '/'
@@ -119,7 +122,7 @@ def strip s, lf, *options
                 state = :sq_string_closing
             when :dq_string_escape
 
-                state = :dq_string_closing
+                state = :dq_string
             when :c_comment_star
 
                 if ?/ == c
@@ -202,19 +205,19 @@ def strip s, lf, *options
                         when :sq_string_open
 
                             state = :sq_string_escape
-                        when :sq_string_quoted
+                        when :sq_string_escape
 
                             state = :sq_string
                         when :dq_string
 
-                            state = :dq_string_quoted
+                            state = :dq_string_escape
                         else
 
                         end
                     else
 
                         case state
-                        when :sq_string_quoted
+                        when :sq_string_escape
 
                             state = :sq_string_closing
                         else

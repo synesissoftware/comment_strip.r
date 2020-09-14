@@ -204,6 +204,86 @@ EOF_main
         assert_equal expected, actual
     end
 
+    def test_code_with_double_quoted_characters_1
+
+        input = <<-EOF_main
+
+        case "'": // " this is the comment "
+EOF_main
+        expected = <<-EOF_main
+
+        case "'": 
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_code_with_double_quoted_characters_2
+
+        input = <<-EOF_main
+
+        case "\\"": // " this is the comment "
+EOF_main
+        expected = <<-EOF_main
+
+        case "\\"": 
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_code_with_double_quoted_characters_3
+
+        input = <<-EOF_main
+
+        case "\\'": // " this is the comment "
+EOF_main
+        expected = <<-EOF_main
+
+        case "\\'": 
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_code_with_double_quoted_characters_4
+
+        input = <<-EOF_main
+
+        case "\\\\": // " this is the comment "
+EOF_main
+        expected = <<-EOF_main
+
+        case "\\\\": 
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
+    def test_code_with_double_quoted_characters_5
+
+        input = <<-EOF_main
+
+        case "\\\\": // " this is the comment "
+EOF_main
+        expected = <<-EOF_main
+
+        case "\\\\": 
+EOF_main
+
+        actual = strip(input, 'C')
+
+        assert_equal expected, actual
+    end
+
     def test_simple_main_with_trailing_cppcomment
 
         input = <<-EOF_main
