@@ -16,6 +16,8 @@ class Test_strip_1 < Test::Unit::TestCase
     def test_nil
 
         assert_nil strip(nil, 'C')
+
+        assert_nil ::CommentStrip.strip(nil, 'C')
     end
 
     def test_unrecognised_families
@@ -36,12 +38,14 @@ class Test_strip_1 < Test::Unit::TestCase
         unrecognised_families.each do |family|
 
             assert_raise_with_message(::RuntimeError, /family.*unrecognised/) { strip('', family) }
+            assert_raise_with_message(::RuntimeError, /family.*unrecognised/) { ::CommentStrip.strip('', family) }
         end
     end
 
     def test_empty
 
         assert_equal "", strip('', 'C')
+        assert_equal "", ::CommentStrip.strip('', 'C')
     end
 
     def test_simple_main
@@ -56,6 +60,7 @@ EOF_main
         expected = input
 
         assert_equal expected, strip(input, 'C')
+        assert_equal expected, ::CommentStrip.strip(input, 'C')
     end
 
     def test_x_1
@@ -88,6 +93,7 @@ EOF_main
 EOF_main
 
         actual = strip(input, 'C')
+        actual = ::CommentStrip.strip(input, 'C')
 
         assert_equal expected, actual
     end
@@ -104,6 +110,7 @@ EOF_main
 EOF_main
 
         actual = strip(input, 'C')
+        actual = ::CommentStrip.strip(input, 'C')
 
         assert_equal expected, actual
     end
@@ -120,6 +127,7 @@ EOF_main
 EOF_main
 
         actual = strip(input, 'C')
+        actual = ::CommentStrip.strip(input, 'C')
 
         assert_equal expected, actual
     end
