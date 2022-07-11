@@ -1,6 +1,6 @@
 # gemspec for comment_strip
 
-$:.unshift File.join(File.dirname(__FILE__), 'lib')
+$:.unshift File.join(__dir__, 'lib')
 
 require 'comment_strip'
 

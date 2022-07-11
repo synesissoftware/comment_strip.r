@@ -4,7 +4,7 @@
 # Purpose:      Version for comment_strip.r library
 #
 # Created:      14th September 2020
-# Updated:      9th July 2022
+# Updated:      11th July 2022
 #
 # Home:         http://github.com/synesissoftware/comment_strip.r
 #
@@ -43,7 +43,7 @@
 module CommentStrip
 
     # Current version of the comment_strip.r library
-    VERSION                 =   '0.1.1.1'
+    VERSION                 =   '0.1.1.2'
 
     private
     VERSION_PARTS_          =   VERSION.split(/[.]/).collect { |n| n.to_i } # :nodoc:

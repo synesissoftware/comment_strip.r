@@ -4,11 +4,11 @@
 # Purpose:      Main file for comment_strip.r library
 #
 # Created:      14th September 2020
-# Updated:      14th September 2020
+# Updated:      11th July 2022
 #
 # Home:         http://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2020, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2020-2022, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,8 +37,8 @@
 # ######################################################################## #
 
 
-require File.join(File.dirname(__FILE__), 'strip')
-require File.join(File.dirname(__FILE__), 'version')
+require File.join(__dir__, 'strip')
+require File.join(__dir__, 'version')
 
 =begin
 =end
