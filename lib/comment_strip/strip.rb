@@ -37,11 +37,16 @@
 # ######################################################################## #
 
 
+require File.join(__dir__, 'language_families', 'c')
+
+require 'xqsr3/quality/parameter_checking'
 
 =begin
 =end
 
 module CommentStrip
+
+    include ::Xqsr3::Quality::ParameterChecking
 
     # Strips comments from an input string, according to the rules and
     # conventions of a given language-family
@@ -49,7 +54,7 @@ module CommentStrip
     # === Signature
     #
     # * *Parameters:*
-    #   - +s+ (::String) the source code
+    #   - +input+ (::String, +nil+) the input source code
     #   - +lf+ (::String) the name of the language family. Currently only
     #      the value +'C'+ is accepted
     #   - +options+ (::Hash) options that moderate the behaviour
@@ -57,216 +62,24 @@ module CommentStrip
     # * *Options:*
     # None currently defined.
     #
-    def self.strip s, lf, **options
+    # === Signature
+    # (String) The stripped for of the input.
+    def strip input, lf, **options
 
-        case lf.upcase
+        check_parameter input, 'input', responds_to: [ :each_char, :empty?, :nil?, ], nil: true
+        check_parameter lf, 'lf', types: [ ::String, ::Symbol ]
+
+        case lf.to_s.upcase
         when 'C'
 
-            ;
+            LanguageFamilies::C.strip input, lf, **options
         else
 
-            raise "language family '#{lf}' unrecognised"
+            raise "language family '#{lf}' unrecognised or not supported1"
         end
-
-        return nil if s.nil?
-        return s if s.empty?
-
-        line    =   0
-        column  =   0
-
-        state   =   :text
-
-        r       =   ''
-
-        cc_lines =   0
-
-        s.each_char do |c|
-
-            case c
-            when ?\r, ?\n
-
-                line += 1
-                column = 0
-            else
-
-                column += 1
-            end
-
-            skip = false
-
-            case c
-            when ?\r, ?\n
-
-                case state
-                when :c_comment, :c_comment_star
-
-                    cc_lines += 1
-
-                    state = :c_comment
-                when :cpp_comment
-
-                    state = :text
-                when :sq_string, :sq_string_escape, :sq_string_closing
-
-                    state = :text
-                when :dq_string_escape
-
-                    state = :dq_string
-                when :slash_start
-
-                    r << '/'
-
-                    state = :text
-                end
-            else
-
-                # special cases:
-                #
-                # - for escaped single/double quote
-                # - for slash-start
-                # - for comment-star
-
-                case state
-                when :sq_string_open
-
-                    state = (?\\ == c) ? :sq_string_escape : :sq_string_closing
-                when :sq_string_escape
-
-                    state = :sq_string_closing
-                when :dq_string_escape
-
-                    state = :dq_string
-                when :c_comment_star
-
-                    case c
-                    when ?/
-
-                        r << ?\n * cc_lines
-                        cc_lines = 0
-
-                        state = :text
-                        skip = true
-                    when '*'
-
-                        ;
-                    else
-
-                        state = :c_comment
-                    end
-                else
-
-                    if false
-                    elsif state == :slash_start && ('/' != c && '*' != c)
-
-                        state = :text
-                        r << '/'
-                    else
-
-                        case c
-                        when '/'
-
-                            case state
-                            when :text
-
-                                state = :slash_start
-                            when :slash_start
-
-                                state = :cpp_comment
-                            when :c_comment_star
-
-                                r << ?\n * cc_lines
-                                cc_lines = 0
-
-                                state = :text
-                                skip = true
-                            end
-                        when '*'
-
-                            case state
-                            when :slash_start
-
-                                state = :c_comment
-                            when :c_comment
-
-                                state = :c_comment_star
-                            else
-
-                            end
-
-                        when ?\'
-
-                            case state
-                            when :text
-
-                                state = :sq_string_open
-                            when :sq_string_closing
-
-                                state = :text
-                            else
-
-                            end
-                        when '"'
-
-                            case state
-                            when :text
-
-                                state = :dq_string
-                            when :dq_string
-
-                                state = :text
-                            else
-                            end
-                        when ?\\
-
-                            case state
-                            when :sq_string_open
-
-                                state = :sq_string_escape
-                            when :sq_string_escape
-
-                                state = :sq_string
-                            when :dq_string
-
-                                state = :dq_string_escape
-                            else
-
-                            end
-                        else
-
-                            case state
-                            when :sq_string_escape
-
-                                state = :sq_string_closing
-                            else
-
-                            end
-                        end
-                    end
-                end
-            end
-
-
-            case state
-            when :slash_start
-            when :cpp_comment
-            when :c_comment
-            when :c_comment_star
-
-            else
-
-                r << c unless skip
-            end
-        end
-
-        r
     end
 
-    # Strips comments
-    def strip s, lf, **options
-
-        ::CommentStrip.strip s, lf, **options
-    end
-
+    extend self
 end # module CommentStrip
 
 # ############################## end of file ############################# #

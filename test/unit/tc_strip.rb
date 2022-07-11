@@ -45,7 +45,7 @@ class Test_strip_1 < Test::Unit::TestCase
     def test_empty
 
         assert_equal "", strip('', 'C')
-        assert_equal "", ::CommentStrip.strip('', 'C')
+        assert_equal "", ::CommentStrip.strip('', :C)
     end
 
     def test_simple_main

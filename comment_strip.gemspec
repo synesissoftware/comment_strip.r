@@ -29,6 +29,6 @@ END_DESC
 
 	spec.required_ruby_version = '~> 2'
 
-	spec.add_development_dependency 'xqsr3', [ '~> 0.37', '>= 0.37.2' ]
+	spec.add_runtime_dependency 'xqsr3', [ '~> 0.37', '>= 0.37.2' ]
 end
 
