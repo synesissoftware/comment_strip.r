@@ -4,11 +4,11 @@
 # Purpose:      Definition of strip() function
 #
 # Created:      14th September 2020
-# Updated:      10th February 2021
+# Updated:      11th July 2022
 #
 # Home:         http://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2020-2021, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2020-2022, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -55,6 +55,7 @@ module CommentStrip
     #   - +options+ (::Hash) options that moderate the behaviour
     #
     # * *Options:*
+    # None currently defined.
     #
     def self.strip s, lf, **options
 

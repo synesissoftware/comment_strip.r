@@ -16,7 +16,17 @@ T.B.C.
 
 ## Installation
 
-Install using `gem install comment_strip-ruby` or add it to your `Gemfile`.
+Install directly:
+
+```bash
+$ gem install comment_strip-ruby
+```
+
+or add it to your `Gemfile`:
+
+```plaintext
+gem 'comment_strip-ruby'
+```
 
 ## Components
 
@@ -24,7 +34,16 @@ T.B.C.
 
 ## Examples
 
-T.B.C.
+It is as simple as the following:
+
+```Ruby
+require 'comment_strip'
+
+stripped = CommentStrip.strip($stdin.read, 'C')
+
+puts "Stripped form of input:\n#{stripped}"
+```
+
 
 ## Project Information
 
