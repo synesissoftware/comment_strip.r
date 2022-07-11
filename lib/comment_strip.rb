@@ -37,10 +37,17 @@
 # ######################################################################## #
 
 
+%w{
+    strip
+    version
+}.each { |mod_name| require File.join(__dir__, 'comment_strip', mod_name) }
+
 =begin
 =end
 
-require File.join(__dir__, 'comment_strip', 'comment_strip')
+# Main module for comment_strip.r library
+module CommentStrip
+end # module CommentStrip
 
 # ############################## end of file ############################# #
 
