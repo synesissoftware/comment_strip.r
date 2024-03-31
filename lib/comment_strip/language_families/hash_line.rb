@@ -1,14 +1,15 @@
 # ######################################################################## #
-# File:     comment_strip/language_families/c.rb
+# File:     comment_strip/language_families/hash_line.rb
 #
-# Purpose:  Definition of strip() function for C-family languages.
+# Purpose:  Definition of strip() function for languages that support single
+#           line comments beginning at the # character.
 #
-# Created:  14th September 2020
+# Created:  1st December 2023
 # Updated:  31st March 2024
 #
 # Home:     http://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2020-2024, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2023-2024, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -45,7 +46,7 @@ require 'xqsr3/quality/parameter_checking'
 module CommentStrip
 module LanguageFamilies
 
-module C
+module HashLine
 
   def self.strip input, lf, **options
 
@@ -57,12 +58,9 @@ module C
 
     # States:
     #
-    # - :c_comment          - in a C comment, i.e. from immediately after "/*"
-    # - :c_comment_star     - in a C comment when just received '*', e.g. from immediately after "/* comment *"
-    # - :cpp_comment        - in a C++ comment, i.e. from immediately after "//"
     # - :dq_string          - within a double-quoted string
     # - :dq_string_escape   - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
-    # - :slash_start        - having found a slash (not in a string)
+    # - :hash_comment       - in a #-comment, i.e. from immediately after "#"
     # - :sq_string_closing  - waiting for final '\'' in a single-quoted string
     # - :sq_string_escape   - within a escaped single-quoted string, i.e. from immediately after "'\"
     # - :sq_string_open     - within a single-quoted string, i.e. from immediately after "'"
@@ -92,12 +90,7 @@ module C
       when ?\r, ?\n
 
         case state
-        when :c_comment, :c_comment_star
-
-          cc_lines += 1
-
-          state = :c_comment
-        when :cpp_comment
+        when :hash_comment
 
           state = :text
         when :sq_string_escape, :sq_string_closing
@@ -106,9 +99,7 @@ module C
         when :dq_string_escape
 
           state = :dq_string
-        when :slash_start
-
-          r << '/'
+        when :hash_comment
 
           state = :text
         end
@@ -118,7 +109,6 @@ module C
         #
         # - for escaped single/double quote
         # - for slash-start
-        # - for comment-star
 
         case state
         when :sq_string_open
@@ -130,118 +120,70 @@ module C
         when :dq_string_escape
 
           state = :dq_string
-        when :c_comment_star
-
-          case c
-          when ?/
-
-            r << ?\n * cc_lines
-            cc_lines = 0
-
-            state = :text
-            skip = true
-          when '*'
-
-            ;
-          else
-
-            state = :c_comment
-          end
         else
 
-          if false
-          elsif state == :slash_start && ('/' != c && '*' != c)
+          case c
+          when '#'
 
-            state = :text
-            r << '/'
-          else
+            case state
+            when :text
 
-            case c
-            when '/'
-
-              case state
-              when :text
-
-                state = :slash_start
-              when :slash_start
-
-                state = :cpp_comment
-              when :c_comment_star
-
-                r << ?\n * cc_lines
-                cc_lines = 0
-
-                state = :text
-                skip = true
-              else
-
-                ;
-              end
-            when '*'
-
-              case state
-              when :slash_start
-
-                state = :c_comment
-              when :c_comment
-
-                state = :c_comment_star
-              else
-
-                ;
-              end
-            when ?\'
-
-              case state
-              when :text
-
-                state = :sq_string_open
-              when :sq_string_closing
-
-                state = :text
-              else
-
-                ;
-              end
-            when '"'
-
-              case state
-              when :text
-
-                state = :dq_string
-              when :dq_string
-
-                state = :text
-              else
-
-                ;
-              end
-            when ?\\
-
-              case state
-              when :sq_string_open
-
-                state = :sq_string_escape
-              when :sq_string_escape
-
-                state = :sq_string_closing
-              when :dq_string
-
-                state = :dq_string_escape
-              else
-
-                ;
-              end
+              state = :hash_comment
             else
 
-              case state
-              when :sq_string_escape
+              ;
+            end
+          when ?\'
 
-                state = :sq_string_closing
-              else
+            case state
+            when :text
 
-                ;
-              end
+              state = :sq_string_open
+            when :sq_string_closing
+
+              state = :text
+            else
+
+              ;
+            end
+          when '"'
+
+            case state
+            when :text
+
+              state = :dq_string
+            when :dq_string
+
+              state = :text
+            else
+
+              ;
+            end
+          when ?\\
+
+            case state
+            when :sq_string_open
+
+              state = :sq_string_escape
+            when :sq_string_escape
+
+              state = :sq_string_closing
+            when :dq_string
+
+              state = :dq_string_escape
+            else
+
+              ;
+            end
+          else
+
+            case state
+            when :sq_string_escape
+
+              state = :sq_string_closing
+            else
+
+              ;
             end
           end
         end
@@ -249,10 +191,7 @@ module C
 
 
       case state
-      when :slash_start
-      when :cpp_comment
-      when :c_comment
-      when :c_comment_star
+      when :hash_comment
 
         ;
       else
@@ -263,7 +202,7 @@ module C
 
     r
   end
-end # module C
+end # module HashLine
 
 end # module LanguageFamilies
 end # module CommentStrip

@@ -9,63 +9,63 @@ require 'xqsr3/extensions/test/unit'
 
 require 'test/unit'
 
-class Test_strip_1 < Test::Unit::TestCase
+class Test_C_strip_1 < Test::Unit::TestCase
 
-    include ::CommentStrip
+  include ::CommentStrip
 
-    def test_nil
+  def test_nil
 
-        assert_nil strip(nil, 'C')
+    assert_nil strip(nil, 'C')
 
-        assert_nil ::CommentStrip.strip(nil, 'C')
+    assert_nil ::CommentStrip.strip(nil, 'C')
+  end
+
+  def test_unrecognised_families
+
+    unrecognised_families = %w{
+
+      Python
+      Perl
+      Ruby
+
+      Java
+      Kotlin
+      Scala
+
+      Rust
+    }
+
+    unrecognised_families.each do |family|
+
+      assert_raise_with_message(::RuntimeError, /family.*unrecognised/) { strip('', family) }
+      assert_raise_with_message(::RuntimeError, /family.*unrecognised/) { ::CommentStrip.strip('', family) }
     end
+  end
 
-    def test_unrecognised_families
+  def test_empty
 
-        unrecognised_families = %w{
+    assert_equal "", strip('', 'C')
+    assert_equal "", ::CommentStrip.strip('', :C)
+  end
 
-            Python
-            Perl
-            Ruby
+  def test_simple_main
 
-            Java
-            Kotlin
-            Scala
-
-            Rust
-        }
-
-        unrecognised_families.each do |family|
-
-            assert_raise_with_message(::RuntimeError, /family.*unrecognised/) { strip('', family) }
-            assert_raise_with_message(::RuntimeError, /family.*unrecognised/) { ::CommentStrip.strip('', family) }
-        end
-    end
-
-    def test_empty
-
-        assert_equal "", strip('', 'C')
-        assert_equal "", ::CommentStrip.strip('', :C)
-    end
-
-    def test_simple_main
-
-        input = <<-EOF_main
+    input = <<-EOF_main
 #include <stdio.h>
 int main(int argc, char* argv[])
 {
     return 0;
 }
 EOF_main
-        expected = input
+    expected = input
 
-        assert_equal expected, strip(input, 'C')
-        assert_equal expected, ::CommentStrip.strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+    assert_equal expected, ::CommentStrip.strip(input, 'C')
+  end
 
-    def test_x_1
+  def test_x_1
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 #ifdef CLARA_PLATFORM_WINDOWS
                 case '/': from = i+1; return SlashOpt;
 #endif
@@ -78,7 +78,7 @@ EOF_main
             return !placeholder.empty();
         }
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 #ifdef CLARA_PLATFORM_WINDOWS
                 case '/': from = i+1; return SlashOpt;
 #endif
@@ -92,232 +92,232 @@ EOF_main
         }
 EOF_main
 
-        actual = strip(input, 'C')
-        actual = ::CommentStrip.strip(input, 'C')
+    actual = strip(input, 'C')
+    actual = ::CommentStrip.strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_x_2
+  def test_x_2
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 } // namespace something
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 } 
 EOF_main
 
-        actual = strip(input, 'C')
-        actual = ::CommentStrip.strip(input, 'C')
+    actual = strip(input, 'C')
+    actual = ::CommentStrip.strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_x_3
+  def test_x_3
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 #endif /* !LOG_PERROR */
 EOF_main
-        expected = <<-EOF_main
+      expected = <<-EOF_main
 
 #endif 
 EOF_main
 
-        actual = strip(input, 'C')
-        actual = ::CommentStrip.strip(input, 'C')
+    actual = strip(input, 'C')
+    actual = ::CommentStrip.strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_single_quoted_characters_1
+  def test_code_with_single_quoted_characters_1
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         case '"': // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case '"': 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_single_quoted_characters_2
+  def test_code_with_single_quoted_characters_2
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
-        case '\\"': // " this is the comment "
+        case '\"': // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
-        case '\\"': 
-EOF_main
-
-        actual = strip(input, 'C')
-
-        assert_equal expected, actual
-    end
-
-    def test_code_with_single_quoted_characters_3
-
-        input = <<-EOF_main
-
-        case '\\'': // " this is the comment "
-EOF_main
-        expected = <<-EOF_main
-
-        case '\\'': 
+        case '\"': 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_single_quoted_characters_4
+  def test_code_with_single_quoted_characters_3
 
-        input = <<-EOF_main
+    input = <<-EOF_main
+
+        case '\'': // " this is the comment "
+EOF_main
+    expected = <<-EOF_main
+
+        case '\'': 
+EOF_main
+
+    actual = strip(input, 'C')
+
+    assert_equal expected, actual
+  end
+
+  def test_code_with_single_quoted_characters_4
+
+    input = <<-EOF_main
 
         case '\\\\': // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case '\\\\': 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_single_quoted_characters_5
+  def test_code_with_single_quoted_characters_5
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         case '\\\\': // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case '\\\\': 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_single_quoted_characters_6
+  def test_code_with_single_quoted_characters_6
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 #define SOME_CHAR '\\x80' /* some char */
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 #define SOME_CHAR '\\x80' 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_double_quoted_characters_1
+  def test_code_with_double_quoted_characters_1
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         case "'": // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case "'": 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_double_quoted_characters_2
+  def test_code_with_double_quoted_characters_2
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         case "\\"": // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case "\\"": 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_double_quoted_characters_3
+  def test_code_with_double_quoted_characters_3
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         case "\\'": // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case "\\'": 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_double_quoted_characters_4
+  def test_code_with_double_quoted_characters_4
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         case "\\\\": // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case "\\\\": 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_code_with_double_quoted_characters_5
+  def test_code_with_double_quoted_characters_5
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         case "\\\\": // " this is the comment "
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         case "\\\\": 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_simple_main_with_trailing_cppcomment
+  def test_simple_main_with_trailing_cppcomment
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 #include <stdio.h>
 int main(int argc, char* argv[])
 {
     return 0; // same as EXIT_SUCCESS
 }
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 #include <stdio.h>
 int main(int argc, char* argv[])
 {
@@ -325,19 +325,19 @@ int main(int argc, char* argv[])
 }
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_simple_main_with_trailing_cppcomment_and_divide_maths
+  def test_simple_main_with_trailing_cppcomment_and_divide_maths
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 #include <stdio.h>
 int main(int argc, char* argv[])
 {
     return 0 / 1; // same as EXIT_SUCCESS
 }
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 #include <stdio.h>
 int main(int argc, char* argv[])
 {
@@ -345,19 +345,19 @@ int main(int argc, char* argv[])
 }
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_simple_main_with_ccomment
+  def test_simple_main_with_ccomment
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 #include <stdio.h>
 int main(int argc, char* argv[])
 {
     return 2; /* same as EXIT_SUCCESS */
 }
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 #include <stdio.h>
 int main(int argc, char* argv[])
 {
@@ -365,38 +365,38 @@ int main(int argc, char* argv[])
 }
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_ccomment_inline
+  def test_ccomment_inline
 
-        input = 'int i = func(/*x=*/x, /*y=*/y);'
-        expected = 'int i = func(x, y);'
+    input = 'int i = func(/*x=*/x, /*y=*/y);'
+    expected = 'int i = func(x, y);'
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_multiline_1
+  def test_multiline_1
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 /** Some function description
  */
 int func();
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
 int func();
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_multiline_2
+  def test_multiline_2
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 /** Some function description
  */
@@ -408,7 +408,7 @@ int func();
 
 int fn();
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -421,12 +421,12 @@ int func();
 int fn();
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_multiline_3
+  def test_multiline_3
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 /** Some function description
  *
@@ -434,7 +434,7 @@ EOF_main
  */
 int func();
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -443,12 +443,12 @@ EOF_main
 int func();
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_multiline_4
+  def test_multiline_4
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 /** //////////////////////////////////
  *
@@ -465,42 +465,72 @@ EOF_main
 int func();
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_comments_in_strings_1
+  def test_comments_in_strings_1
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         string s("//"); // THIS is the comment
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         string s("//"); 
 EOF_main
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_comments_in_strings_2
+  def test_comments_in_strings_2
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
         string s("/*"); // THIS is the comment
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
         string s("/*"); 
 EOF_main
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_real_sample_1
+  def test_comments_in_strings_3
 
-        input = <<-EOF_main
+    input = <<-EOF_main
+
+        string s("/"); // THIS is the comment
+EOF_main
+    expected = <<-EOF_main
+
+        string s("/"); 
+EOF_main
+    actual = strip(input, 'C')
+
+    assert_equal expected, actual
+  end
+
+  def test_comments_in_strings_4
+
+    input = <<-EOF_main
+
+        string s("/* this is a comment */"); // this is THE comment
+EOF_main
+    expected = <<-EOF_main
+
+        string s("/* this is a comment */"); 
+EOF_main
+    actual = strip(input, 'C')
+
+    assert_equal expected, actual
+  end
+
+  def test_real_sample_1
+
+    input = <<-EOF_main
 /* /////////////////////////////////////////////////////////////////////////
  * includes
  *
@@ -531,7 +561,7 @@ EOF_main
 # pragma warning(disable : 4702) // suppresses "unreachable code"
 #endif /* compiler */
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -562,14 +592,14 @@ EOF_main
 # pragma warning(disable : 4702) 
 #endif 
 EOF_main
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_real_sample_2
+  def test_real_sample_2
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 /* /////////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -616,7 +646,7 @@ EOF_main
 # include <crtdbg.h>
 #endif
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -664,12 +694,12 @@ EOF_main
 #endif
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_real_sample_3
+  def test_real_sample_3
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 /* /////////////////////////////////////////////////////////////////////////
  * File:        src/fmt_cache.cpp
  *
@@ -752,7 +782,7 @@ EOF_main
 #include <new>
 EOF_main
 
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -835,14 +865,14 @@ EOF_main
 #include <new>
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_real_sample_4
+  def test_real_sample_4
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 /* /////////////////////////////////////////////////////////////////////////
  * File:        src/fmt_cache.cpp
  *
@@ -1547,7 +1577,7 @@ pattern_t pattern_record_t::pattern() const
 /* ///////////////////////////// end of file //////////////////////////// */
 EOF_main
 
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -2252,12 +2282,12 @@ pattern_t pattern_record_t::pattern() const
 
 EOF_main
 
-        assert_equal expected, strip(input, 'C')
-    end
+    assert_equal expected, strip(input, 'C')
+  end
 
-    def test_real_sample_5
+  def test_real_sample_5
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 /*****************************************************************************
 /*                             Start of crcmodel.c                            
 /*****************************************************************************
@@ -2303,7 +2333,7 @@ LOCAL ulong reflect (ulong v, int b)
 /* Returns the value v with the bottom b [0,32] bits reflected. */
 /* Example: reflect(0x3e23L,3) == 0x3e26                        */
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -2349,14 +2379,14 @@ LOCAL ulong reflect (ulong v, int b)
 
 
 EOF_main
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def _test_real_sample_6
+  def _test_real_sample_6
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 
 
 
@@ -2445,7 +2475,7 @@ namespace {
             default:
                 // Check for control characters and invalid utf-8
 EOF_main
-x1 = <<-EOF_main
+    x1 = <<-EOF_main
                 // Escape control characters in standard ascii
                 // see http://stackoverflow.com/questions/404107/why-are-control-characters-illegal-in-xml-1-0
                 if (c < 0x09 || (c > 0x0D && c < 0x20) || c == 0x7F) {
@@ -2646,7 +2676,7 @@ x1 = <<-EOF_main
 }
 EOF_main
 
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -2735,7 +2765,7 @@ namespace {
             default:
                 
 EOF_main
-x1 = <<-EOF_main
+    x1 = <<-EOF_main
 
                 
                 
@@ -2937,14 +2967,14 @@ x1 = <<-EOF_main
 }
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_real_sample_7
+  def test_real_sample_7
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 #if defined(RECLS_CPP_NO_METHOD_PROPERTY_SUPPORT)
  /* Do not define RECLS_CPP_METHOD_PROPERTY_SUPPORT */
 #else /* ? RECLS_CPP_???_METHOD_PROPERTY_SUPPORT */
@@ -2966,7 +2996,7 @@ EOF_main
 #endif /* RECLS_CPP_???_METHOD_PROPERTY_SUPPORT */
 
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 #if defined(RECLS_CPP_NO_METHOD_PROPERTY_SUPPORT)
  
 #else 
@@ -2989,14 +3019,14 @@ EOF_main
 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_real_sample_8
+  def test_real_sample_8
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 /*****************************************************************************
 /*                             Start of crcmodel.c                            
 /*****************************************************************************
@@ -3141,7 +3171,7 @@ ulong cm_tab (p_cm_t p_cm, int index)
 /*                             End of crcmodel.c                              */
 /******************************************************************************/
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -3287,14 +3317,14 @@ ulong cm_tab (p_cm_t p_cm, int index)
 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_real_sample_9
+  def test_real_sample_9
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 /*
  * This source file is part of the bstring string library.  This code was
  * written by Paul Hsieh in 2002-2010, and is covered by either the 3-clause 
@@ -3436,7 +3466,7 @@ int ret = 0;
 }
 
 EOF_main
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -3579,14 +3609,14 @@ int ret = 0;
 
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 
-    def test_real_sample_10
+  def test_real_sample_10
 
-        input = <<-EOF_main
+    input = <<-EOF_main
 // Scintilla source code edit control
 /** @file CharacterSet.h
  ** Encapsulates a set of characters. Used to test if a character is within a set.
@@ -3647,7 +3677,7 @@ public:
 };
 EOF_main
 
-        expected = <<-EOF_main
+    expected = <<-EOF_main
 
 
 
@@ -3708,10 +3738,10 @@ public:
 };
 EOF_main
 
-        actual = strip(input, 'C')
+    actual = strip(input, 'C')
 
-        assert_equal expected, actual
-    end
+    assert_equal expected, actual
+  end
 end
 
 # ############################## end of file ############################# #

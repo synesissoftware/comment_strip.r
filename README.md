@@ -30,8 +30,10 @@ gem 'comment_strip-ruby'
 
 ## Components
 
-T.B.C.
+Current version supports following language families:
 
+* `'C'` - C-family languages, recognising `//` line and `/* . . . */` block comments;
+* `'Hash_Line'` - Generic support for `#` line comments, as found in shell scripts and languages such as **Perl**, **Python**, and **Ruby**. Does _NOT_ (yet) provide any language-specific smarts such as she-bang comments and directive comments;
 ## Examples
 
 It is as simple as the following:

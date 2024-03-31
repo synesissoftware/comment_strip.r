@@ -1,14 +1,14 @@
 # ######################################################################## #
-# File:         comment_strip/strip.rb
+# File:     comment_strip/strip.rb
 #
-# Purpose:      Definition of strip() function
+# Purpose:  Definition of strip() function
 #
-# Created:      14th September 2020
-# Updated:      11th July 2022
+# Created:  14th September 2020
+# Updated:  30th March 2024
 #
-# Home:         http://github.com/synesissoftware/comment_strip.r
+# Home:     http://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2020-2022, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2020-2024, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,15 @@
 # ######################################################################## #
 
 
-require File.join(__dir__, 'language_families', 'c')
+
+%w{
+
+  c
+  hash_line
+}.each do |name|
+
+  require File.join(File.dirname(__FILE__), 'language_families', name)
+end
 
 require 'xqsr3/quality/parameter_checking'
 
@@ -54,16 +62,17 @@ module CommentStrip
     # === Signature
     #
     # * *Parameters:*
-    #   - +input+ (::String, +nil+) the input source code
-    #   - +lf+ (::String) the name of the language family. Currently only
-    #      the value +'C'+ is accepted
-    #   - +options+ (::Hash) options that moderate the behaviour
+    #   - +input+ (+String+, +nil+) the input source code
+    #   - +lf+ (+String+) the name of the language family, which must be one of the following:
+    #      - +'C'+
+    #      - +'Hash_Line'+
+    #   - +options+ (+Hash+) options that moderate the behaviour
     #
     # * *Options:*
     # None currently defined.
     #
     # === Signature
-    # (String) The stripped for of the input.
+    # (+String+) The stripped for of the input.
     def strip input, lf, **options
 
         check_parameter input, 'input', responds_to: [ :each_char, :empty?, :nil?, ], nil: true
@@ -73,6 +82,9 @@ module CommentStrip
         when 'C'
 
             LanguageFamilies::C.strip input, lf, **options
+        when 'HASH_LINE'
+
+            LanguageFamilies::HashLine.strip input, lf, **options
         else
 
             raise "language family '#{lf}' unrecognised or not supported1"
