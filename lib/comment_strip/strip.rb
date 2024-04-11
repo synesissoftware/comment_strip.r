@@ -4,7 +4,7 @@
 # Purpose:  Definition of strip() function
 #
 # Created:  14th September 2020
-# Updated:  30th March 2024
+# Updated:  11th April 2024
 #
 # Home:     http://github.com/synesissoftware/comment_strip.r
 #
@@ -57,22 +57,25 @@ module CommentStrip
     include ::Xqsr3::Quality::ParameterChecking
 
     # Strips comments from an input string, according to the rules and
-    # conventions of a given language-family
+    # conventions of a given language-family.
     #
     # === Signature
     #
     # * *Parameters:*
-    #   - +input+ (+String+, +nil+) the input source code
-    #   - +lf+ (+String+) the name of the language family, which must be one of the following:
-    #      - +'C'+
-    #      - +'Hash_Line'+
-    #   - +options+ (+Hash+) options that moderate the behaviour
+    #   - +input+ (+String+, +nil+) the input source code;
+    #   - +lf+ (+String+) the name of the language family, which must be one of the following listed in the section below;
+    #   - +options+ (+Hash+) options that moderate the behaviour;
     #
     # * *Options:*
     # None currently defined.
     #
-    # === Signature
+    # === Return
     # (+String+) The stripped for of the input.
+    #
+    # === Supported language families
+    # Currently supported language families:
+    #   - +'C'+ - including C, C++, C#, Go, Java, Rust;
+    #   - +'Hash_Line'+ - include Ruby, Python, Ruby, shell;
     def strip input, lf, **options
 
         check_parameter input, 'input', responds_to: [ :each_char, :empty?, :nil?, ], nil: true
