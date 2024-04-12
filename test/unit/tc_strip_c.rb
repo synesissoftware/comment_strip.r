@@ -2384,7 +2384,7 @@ EOF_main
     assert_equal expected, actual
   end
 
-  def _test_real_sample_6
+  def test_real_sample_6
 
     input = <<-EOF_main
 
@@ -2474,8 +2474,6 @@ namespace {
 
             default:
                 // Check for control characters and invalid utf-8
-EOF_main
-    x1 = <<-EOF_main
                 // Escape control characters in standard ascii
                 // see http://stackoverflow.com/questions/404107/why-are-control-characters-illegal-in-xml-1-0
                 if (c < 0x09 || (c > 0x0D && c < 0x20) || c == 0x7F) {
@@ -2764,9 +2762,6 @@ namespace {
 
             default:
                 
-EOF_main
-    x1 = <<-EOF_main
-
                 
                 
                 if (c < 0x09 || (c > 0x0D && c < 0x20) || c == 0x7F) {
