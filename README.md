@@ -3,6 +3,7 @@
 Comment Strip, for Ruby
 
 [![Gem Version](https://badge.fury.io/rb/comment_strip-ruby.svg)](https://badge.fury.io/rb/comment_strip-ruby)
+[![Ruby](https://github.com/synesissoftware/comment_strip.r/actions/workflows/ruby.yml/badge.svg)](https://github.com/synesissoftware/comment_strip.r/actions/workflows/ruby.yml)
 
 
 ## Introduction
