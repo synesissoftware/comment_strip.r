@@ -13,8 +13,7 @@
 
 ## Packaging improvements
 
-* \<none>
-
+* [ ] Rename gemspec so the filename stem matches `spec.name` (`comment_strip.gemspec` → **comment_strip-ruby.gemspec**);
 
 
 <!-- ########################### end of file ########################### -->
