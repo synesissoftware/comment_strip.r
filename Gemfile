@@ -2,13 +2,11 @@
 
 source "https://rubygems.org"
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
-
 if RUBY_VERSION >= '2'
 
-	gem 'xqsr3', '~> 0.38'
+  gem "xqsr3", [ '~> 0.39', '>= 0.39.4' ]
 else
 
-	gem 'xqsr3', '~> 0.21.3'
+  gem "xqsr3", '~> 0.21.3'
 end
 
