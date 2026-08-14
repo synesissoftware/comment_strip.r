@@ -1,4 +1,4 @@
-# comment_strip.r
+# comment_strip.r <!-- omit in toc -->
 
 Comment Strip, for Ruby
 
