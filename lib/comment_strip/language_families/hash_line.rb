@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # ######################################################################## #
 # File:     comment_strip/language_families/hash_line.rb
 #
@@ -5,7 +6,7 @@
 #           line comments beginning at the # character.
 #
 # Created:  1st December 2023
-# Updated:  31st March 2024
+# Updated:  15th August 2026
 #
 # Home:     http://github.com/synesissoftware/comment_strip.r
 #

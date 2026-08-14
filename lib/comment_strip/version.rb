@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 # ######################################################################## #
 # File:     comment_strip/version.rb
 #
 # Purpose:  Version for comment_strip.r library
 #
 # Created:  14th September 2020
-# Updated:  11th April 2024
+# Updated:  15th August 2026
 #
 # Home:     http://github.com/synesissoftware/comment_strip.r
 #

@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 # ######################################################################## #
 # File:         comment_strip.rb
 #
 # Purpose:      Top-level include for comment_strip.r library
 #
 # Created:      14th September 2020
-# Updated:      11th July 2022
+# Updated:      15th August 2026
 #
 # Home:         http://github.com/synesissoftware/comment_strip.r
 #

@@ -3,6 +3,7 @@
 
 ## 0.2.0.1 - 11th April 2024
 
+* added `# frozen_string_literal: true` to all **lib/** sources;
 * various boilerplate improvements;
 * fixed an unused test;
 
