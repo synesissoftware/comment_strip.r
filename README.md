@@ -8,7 +8,7 @@ Comment Strip, for Ruby
 
 ## Introduction
 
-T.B.C.
+**comment_strip.r** strips comments from source text for a small set of language families. Call `CommentStrip.strip(input, language_family)` (or the equivalent instance API) with a recognised family such as `:C` or `:Hash_Line`; the library returns the input with comments removed according to that family's rules.
 
 
 ## Table of Contents
@@ -85,7 +85,7 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 ### Related projects
 
-T.B.C.
+* \<none> — no sibling-language **comment_strip** ports are published in freelibs at present;
 
 
 ### License
