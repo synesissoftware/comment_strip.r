@@ -5,11 +5,11 @@
 # Purpose:  Definition of strip() function
 #
 # Created:  14th September 2020
-# Updated:  15th August 2026
+# Updated:  19th August 2026
 #
-# Home:     http://github.com/synesissoftware/comment_strip.r
+# Home:     https://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2020-2024, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2020-2026, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without

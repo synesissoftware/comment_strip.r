@@ -2,8 +2,31 @@
 
 Comment Strip, for Ruby
 
+![Language](https://img.shields.io/badge/Ruby-CC342D?style=flat&logo=ruby&logoColor=white)
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Gem Version](https://badge.fury.io/rb/comment_strip-ruby.svg)](https://badge.fury.io/rb/comment_strip-ruby)
+[![Last Commit](https://img.shields.io/github/last-commit/synesissoftware/comment_strip.r)](https://github.com/synesissoftware/comment_strip.r/commits/master)
 [![Ruby](https://github.com/synesissoftware/comment_strip.r/actions/workflows/ruby.yml/badge.svg)](https://github.com/synesissoftware/comment_strip.r/actions/workflows/ruby.yml)
+
+
+## Table of Contents <!-- omit in toc -->
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Components](#components)
+- [Examples](#examples)
+- [Project Information](#project-information)
+  - [Where to get help](#where-to-get-help)
+  - [Contribution guidelines](#contribution-guidelines)
+  - [Dependencies](#dependencies)
+    - [Efferent (fan-out)](#efferent-fan-out)
+      - [Runtime Dependencies (aka "Normal Dependencies")](#runtime-dependencies-aka-normal-dependencies)
+      - [Development Dependencies](#development-dependencies)
+    - [Afferent (fan-in)](#afferent-fan-in)
+      - [Runtime dependents](#runtime-dependents)
+      - [Development dependents](#development-dependents)
+  - [Related projects](#related-projects)
+  - [License](#license)
 
 
 ## Introduction
@@ -11,27 +34,16 @@ Comment Strip, for Ruby
 **comment_strip.r** strips comments from source text for a small set of language families. Call `CommentStrip.strip(input, language_family)` (or the equivalent instance API) with a recognised family such as `:C` or `:Hash_Line`; the library returns the input with comments removed according to that family's rules.
 
 
-## Table of Contents
-
-1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Components](#components)
-4. [Project Information](#project-information)
-
-
 ## Installation
 
-Install directly:
+Install via **gem** as in:
 
-```bash
-$ gem install comment_strip-ruby
+```
+gem install comment_strip-ruby
 ```
 
-or add it to your `Gemfile`:
+or add it to your `Gemfile`.
 
-```plaintext
-gem 'comment_strip-ruby'
-```
 
 ## Components
 
@@ -53,14 +65,10 @@ stripped = CommentStrip.strip($stdin.read, :C)
 puts "Stripped form of input:\n#{stripped}"
 ```
 
-Several examples are provided under the **examples/** directory.
+Examples are provided in the ```examples``` directory. A detailed list TOC of them is provided in [EXAMPLES.md](./EXAMPLES.md).
 
 
 ## Project Information
-
-### RubyGems page
-
-[**comment_strip-ruby**](https://rubygems.org/gems/comment_strip-ruby/)
 
 
 ### Where to get help
@@ -75,12 +83,36 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 ### Dependencies
 
-+ [**xqsr3**](https://github.com/synesissoftware/xqsr3);
+
+#### Efferent (fan-out)
+
+Libraries upon which **comment_strip.r** depends:
 
 
-#### Test-only dependencies
+##### Runtime Dependencies (aka "Normal Dependencies")
 
-\<none>
+* [**xqsr3**](https://github.com/synesissoftware/xqsr3);
+
+
+##### Development Dependencies
+
+* [**rake**](https://rubygems.org/gems/rake);
+* [**test-unit**](https://rubygems.org/gems/test-unit);
+
+
+#### Afferent (fan-in)
+
+Projects that depend on **comment_strip.r**:
+
+
+##### Runtime dependents
+
+* \<none>;
+
+
+##### Development dependents
+
+* \<none>;
 
 
 ### Related projects
@@ -94,4 +126,3 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 
 <!-- ########################### end of file ########################### -->
-
