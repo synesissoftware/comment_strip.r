@@ -105,7 +105,8 @@ module HashLine
       if :text == state && '<' == c && '<' == input[i + 1]
         heredoc_offset = i + 2
         heredoc_offset += 1 if '~' == input[heredoc_offset]
-        heredoc_quote = input[heredoc_offset]
+        heredoc_quote = input[heredoc_offset] if
+          [ '\'', '"', ].include?(input[heredoc_offset])
         heredoc_offset += 1 if [ '\'', '"', ].include?(heredoc_quote)
         heredoc_start = heredoc_offset
 
