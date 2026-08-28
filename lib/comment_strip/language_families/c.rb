@@ -263,6 +263,7 @@ module C
     end
 
     r << '/' if :slash_start == state
+    r << ?\n * cc_lines if [ :c_comment, :c_comment_star, ].include?(state)
 
     r
   end
