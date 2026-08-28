@@ -75,7 +75,6 @@ module HashLine
 
     r       =   String.new(encoding: input.encoding)
 
-    cc_lines =   0
     percent_open = nil
     percent_closing = nil
     heredoc_terminator = nil
@@ -156,9 +155,6 @@ module HashLine
         when :heredoc_header
 
           state = :heredoc_body
-        when :hash_comment
-
-          state = :text
         end
       else
 

@@ -872,8 +872,6 @@ EOF_main
 #include <new>
 EOF_main
 
-    actual = strip(input, 'C')
-
     assert_equal expected, strip(input, 'C')
   end
 
