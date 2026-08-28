@@ -62,6 +62,8 @@ module HashLine
     # - :dq_string          - within a double-quoted string
     # - :dq_string_escape   - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
     # - :hash_comment       - in a #-comment, i.e. from immediately after "#"
+    # - :percent_string     - within a Ruby percent string
+    # - :percent_string_open - waiting for the opening delimiter of a Ruby percent string
     # - :sq_string_closing  - waiting for final '\'' in a single-quoted string
     # - :sq_string_escape   - within a escaped single-quoted string, i.e. from immediately after "'\"
     # - :sq_string_open     - within a single-quoted string, i.e. from immediately after "'"
@@ -72,8 +74,29 @@ module HashLine
     r       =   String.new(encoding: input.encoding)
 
     cc_lines =   0
+    percent_open = nil
+    percent_closing = nil
 
-    input.each_char do |c|
+    i = 0
+    while i < input.length
+      c = input[i]
+      percent_start = false
+
+      if :text == state && '%' == c
+        percent_type = input[i + 1]
+        percent_delimiter = input[i + 2]
+
+        if [ 'q', 'w', ].include?(percent_type) && percent_delimiter
+          percent_open = percent_delimiter
+          percent_closing = case percent_delimiter
+                            when '{' then '}'
+                            when '[' then ']'
+                            when '(' then ')'
+                            else percent_open
+                            end
+          percent_start = true
+        end
+      end
 
       case c
       when ?\r, ?\n
@@ -112,6 +135,12 @@ module HashLine
         # - for slash-start
 
         case state
+        when :percent_string_open
+
+          state = :percent_string if c == percent_open
+        when :percent_string
+
+          state = :text if c == percent_closing
         when :sq_string_open
 
           case c
@@ -201,6 +230,9 @@ module HashLine
 
         r << c unless skip
       end
+
+      state = :percent_string_open if percent_start
+      i += 1
     end
 
     r
