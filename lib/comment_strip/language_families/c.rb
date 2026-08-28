@@ -74,13 +74,14 @@ module C
     r       =   String.new(encoding: input.encoding)
 
     cc_lines =   0
+    previous_was_cr = false
 
     input.each_char do |c|
 
       case c
       when ?\r, ?\n
 
-        line += 1
+        line += 1 unless ?\n == c && previous_was_cr
         column = 0
       else
 
@@ -95,7 +96,7 @@ module C
         case state
         when :c_comment, :c_comment_star
 
-          cc_lines += 1
+          cc_lines += 1 unless ?\n == c && previous_was_cr
 
           state = :c_comment
         when :cpp_comment
@@ -260,6 +261,8 @@ module C
 
         r << c unless skip
       end
+
+      previous_was_cr = ?\r == c
     end
 
     r << '/' if :slash_start == state
