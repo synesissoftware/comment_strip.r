@@ -221,7 +221,13 @@ module C
               case state
               when :text
 
-                state = :sq_string_open
+                if i > 0 && input[i + 1] &&
+                   input[i - 1] >= ?0 && input[i - 1] <= ?9 &&
+                   input[i + 1] >= ?0 && input[i + 1] <= ?9
+                  ;
+                else
+                  state = :sq_string_open
+                end
               when :sq_string_closing
 
                 state = :text
