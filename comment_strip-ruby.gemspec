@@ -4,7 +4,7 @@
 # Purpose:  Gemspec for comment_strip.r library
 #
 # Created:  14th September 2020
-# Updated:  19th August 2026
+# Updated:  28th August 2026
 #
 # ######################################################################## #
 
@@ -12,6 +12,9 @@
 $:.unshift File.join(File.dirname(__FILE__), 'lib')
 
 require 'comment_strip/version'
+
+
+PROJECT_URL = 'https://github.com/synesissoftware/comment_strip.r'
 
 
 Gem::Specification.new do |spec|
@@ -29,7 +32,7 @@ END_DESC
   spec.email        = [
     'matthew@synesis.com.au',
   ]
-  spec.homepage     = 'https://github.com/synesissoftware/comment_strip.r'
+  spec.homepage     = PROJECT_URL
   spec.license      = 'BSD-3-Clause'
 
   spec.required_ruby_version = [ '>= 2.0' ]
@@ -37,10 +40,10 @@ END_DESC
   spec.add_runtime_dependency "xqsr3", [ '>= 0.39.5', '< 1.0' ]
 
   spec.metadata = {
-    'bug_tracker_uri' => 'https://github.com/synesissoftware/comment_strip.r/issues',
-    'changelog_uri' => 'https://github.com/synesissoftware/comment_strip.r/blob/master/CHANGES.md',
-    'homepage_uri' => 'https://github.com/synesissoftware/comment_strip.r',
-    'source_code_uri' => 'https://github.com/synesissoftware/comment_strip.r',
+    'bug_tracker_uri' => "#{PROJECT_URL}/issues",
+    'changelog_uri' => "#{PROJECT_URL}/blob/master/CHANGES.md",
+    'homepage_uri' => PROJECT_URL,
+    'source_code_uri' => PROJECT_URL,
   }
 
   spec.files = Dir[
