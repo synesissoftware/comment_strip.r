@@ -114,10 +114,15 @@ module HashLine
         case state
         when :sq_string_open
 
-          state = (?\\ == c) ? :sq_string_escape : :sq_string_closing
+          case c
+          when ?\\
+            state = :sq_string_escape
+          when ?\'
+            state = :text
+          end
         when :sq_string_escape
 
-          state = :sq_string_closing
+          state = :sq_string_open
         when :dq_string_escape
 
           state = :dq_string
@@ -140,9 +145,6 @@ module HashLine
             when :text
 
               state = :sq_string_open
-            when :sq_string_closing
-
-              state = :text
             else
 
               ;
