@@ -1,5 +1,12 @@
 #! /usr/bin/env ruby
 
+# NOTE: TAB characters in this test file are intentional and occur only
+# inside HEREDOC fixtures containing imported C/C++ source. They preserve
+# the fixtures' original whitespace so comment stripping can be tested
+# accurately. All Ruby test code and all non-fixture lines must use spaces,
+# with two-space indentation; do not add TABs elsewhere.
+
+
 $:.unshift File.join(__dir__, '../..', 'lib')
 
 

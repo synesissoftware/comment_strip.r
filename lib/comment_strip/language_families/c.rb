@@ -71,7 +71,7 @@ module C
 
     state   =   :text
 
-    r       =   String.new
+    r       =   String.new(encoding: input.encoding)
 
     cc_lines =   0
 
