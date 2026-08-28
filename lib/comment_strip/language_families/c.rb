@@ -76,7 +76,31 @@ module C
     cc_lines =   0
     previous_was_cr = false
 
-    input.each_char do |c|
+    i = 0
+    while i < input.length
+      c = input[i]
+
+      if ?\\ == c
+        next_c = input[i + 1]
+
+        if ?\n == next_c
+          i += 2
+          previous_was_cr = false
+          next
+        elsif ?\r == next_c
+          i += 2
+          previous_was_cr = false
+
+          if ?\n == input[i]
+            i += 1
+            next
+          end
+
+          next if i >= input.length
+
+          c = input[i]
+        end
+      end
 
       case c
       when ?\r, ?\n
@@ -263,6 +287,7 @@ module C
       end
 
       previous_was_cr = ?\r == c
+      i += 1
     end
 
     r << '/' if :slash_start == state
