@@ -59,15 +59,17 @@ module HashLine
 
     # States:
     #
-    # - :dq_string          - within a double-quoted string
-    # - :dq_string_escape   - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
-    # - :hash_comment       - in a #-comment, i.e. from immediately after "#"
-    # - :percent_string     - within a Ruby percent string
-    # - :percent_string_open - waiting for the opening delimiter of a Ruby percent string
-    # - :sq_string_closing  - waiting for final '\'' in a single-quoted string
-    # - :sq_string_escape   - within a escaped single-quoted string, i.e. from immediately after "'\"
-    # - :sq_string_open     - within a single-quoted string, i.e. from immediately after "'"
-    # - :text               - regular part of the code
+    # - :dq_string            - within a double-quoted string
+    # - :dq_string_escape     - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
+    # - :hash_comment         - in a #-comment, i.e. from immediately after "#"
+    # - :heredoc_body         - within a Ruby heredoc body
+    # - :heredoc_header       - within a Ruby heredoc header
+    # - :percent_string       - within a Ruby percent string
+    # - :percent_string_open  - waiting for the opening delimiter of a Ruby percent string
+    # - :sq_string_closing    - waiting for final '\'' in a single-quoted string
+    # - :sq_string_escape     - within a escaped single-quoted string, i.e. from immediately after "'\"
+    # - :sq_string_open       - within a single-quoted string, i.e. from immediately after "'"
+    # - :text                 - regular part of the code
 
     state   =   :text
 
@@ -76,6 +78,8 @@ module HashLine
     cc_lines =   0
     percent_open = nil
     percent_closing = nil
+    heredoc_terminator = nil
+    at_line_start = true
 
     i = 0
     while i < input.length
@@ -95,6 +99,31 @@ module HashLine
                             else percent_open
                             end
           percent_start = true
+        end
+      end
+
+      if :text == state && '<' == c && '<' == input[i + 1]
+        heredoc_offset = i + 2
+        heredoc_offset += 1 if '~' == input[heredoc_offset]
+        heredoc_quote = input[heredoc_offset]
+        heredoc_offset += 1 if [ '\'', '"', ].include?(heredoc_quote)
+        heredoc_start = heredoc_offset
+
+        while heredoc_offset < input.length &&
+              ((?a <= input[heredoc_offset] &&
+                input[heredoc_offset] <= ?z) ||
+               (?A <= input[heredoc_offset] &&
+                input[heredoc_offset] <= ?Z) ||
+               (?0 <= input[heredoc_offset] &&
+                input[heredoc_offset] <= ?9) ||
+               '_' == input[heredoc_offset])
+          heredoc_offset += 1
+        end
+
+        if heredoc_start < heredoc_offset &&
+           (!heredoc_quote || heredoc_quote == input[heredoc_offset])
+          heredoc_terminator = input[heredoc_start...heredoc_offset]
+          state = :heredoc_header
         end
       end
 
@@ -123,6 +152,9 @@ module HashLine
         when :dq_string_escape
 
           state = :dq_string
+        when :heredoc_header
+
+          state = :heredoc_body
         when :hash_comment
 
           state = :text
@@ -135,6 +167,25 @@ module HashLine
         # - for slash-start
 
         case state
+        when :heredoc_body
+
+          if at_line_start
+            heredoc_match = true
+            heredoc_index = 0
+
+            while heredoc_index < heredoc_terminator.length
+              heredoc_match = false unless input[i + heredoc_index] ==
+                                            heredoc_terminator[heredoc_index]
+              heredoc_index += 1
+            end
+
+            if heredoc_match &&
+               [ nil, ?\r, ?\n, ].include?(
+                 input[i + heredoc_terminator.length]
+               )
+              state = :text
+            end
+          end
         when :percent_string_open
 
           state = :percent_string if c == percent_open
@@ -232,6 +283,7 @@ module HashLine
       end
 
       state = :percent_string_open if percent_start
+      at_line_start = ?\r == c || ?\n == c
       i += 1
     end
 
