@@ -6,7 +6,7 @@
 #           line comments beginning at the # character.
 #
 # Created:  1st December 2023
-# Updated:  19th August 2026
+# Updated:  28th August 2026
 #
 # Home:     https://github.com/synesissoftware/comment_strip.r
 #
