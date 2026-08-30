@@ -5,7 +5,7 @@
 # Purpose:  Definition of strip() function for C-family languages.
 #
 # Created:  14th September 2020
-# Updated:  28th August 2026
+# Updated:  30th August 2026
 #
 # Home:     https://github.com/synesissoftware/comment_strip.r
 #
@@ -79,7 +79,8 @@ module C
 
     state   =   :text
 
-    r       =   String.new(encoding: input.encoding)
+    r       =   String.new
+    r.force_encoding input.encoding
 
     cc_lines =   0
     previous_was_cr = false

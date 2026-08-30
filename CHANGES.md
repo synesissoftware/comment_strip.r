@@ -10,7 +10,8 @@
 * **README.md**: tagline before badges; canonical five-badge row; TOC after badges; nested **Dependencies** (Efferent / Afferent);
 * **EXAMPLES.md** catalogues **./examples/read_c_family_source.rb** and **./examples/read_c_family_source_from_stdin.rb**;
 * library source `Home:` URLs now use `https`;
-* **lib/** language-family `strip` methods build the result with `String.new` so frozen string literals (Ruby **3.4** / `# frozen_string_literal: true`) do not raise `FrozenError`;
+* **lib/** language-family `strip` methods build the result with Ruby **2.0**-compatible `String#force_encoding` so frozen string literals (Ruby **3.4** / `# frozen_string_literal: true`) do not raise `FrozenError`;
+* removed unused local variables and a duplicate `when` clause reported by Ruby warnings;
 * updated **run_all_unit_tests.sh** (from https://github.com/synesissoftware/misc-dev-scripts) to skip **tput** when **$TERM** is unset or stdout is not a TTY;
 
 

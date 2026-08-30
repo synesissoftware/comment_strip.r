@@ -6,7 +6,7 @@
 #           line comments beginning at the # character.
 #
 # Created:  1st December 2023
-# Updated:  28th August 2026
+# Updated:  30th August 2026
 #
 # Home:     https://github.com/synesissoftware/comment_strip.r
 #
@@ -73,9 +73,9 @@ module HashLine
 
     state   =   :text
 
-    r       =   String.new(encoding: input.encoding)
+    r       =   String.new
+    r.force_encoding input.encoding
 
-    cc_lines =   0
     percent_open = nil
     percent_closing = nil
     heredoc_terminator = nil
@@ -156,9 +156,6 @@ module HashLine
         when :heredoc_header
 
           state = :heredoc_body
-        when :hash_comment
-
-          state = :text
         end
       else
 
