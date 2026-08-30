@@ -1,14 +1,15 @@
+# frozen_string_literal: true
 # ######################################################################## #
 # File:     comment_strip/language_families/c.rb
 #
 # Purpose:  Definition of strip() function for C-family languages.
 #
 # Created:  14th September 2020
-# Updated:  31st March 2024
+# Updated:  30th August 2026
 #
-# Home:     http://github.com/synesissoftware/comment_strip.r
+# Home:     https://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2020-2024, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2020-2026, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -57,29 +58,63 @@ module C
 
     # States:
     #
-    # - :c_comment          - in a C comment, i.e. from immediately after "/*"
-    # - :c_comment_star     - in a C comment when just received '*', e.g. from immediately after "/* comment *"
-    # - :cpp_comment        - in a C++ comment, i.e. from immediately after "//"
-    # - :dq_string          - within a double-quoted string
-    # - :dq_string_escape   - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
-    # - :slash_start        - having found a slash (not in a string)
-    # - :sq_string_closing  - waiting for final '\'' in a single-quoted string
-    # - :sq_string_escape   - within a escaped single-quoted string, i.e. from immediately after "'\"
-    # - :sq_string_open     - within a single-quoted string, i.e. from immediately after "'"
-    # - :text               - regular part of the code
+    # - :c_comment              - in a C comment, i.e. from immediately after "/*"
+    # - :c_comment_star         - in a C comment when just received '*', e.g. from immediately after "/* comment *"
+    # - :cpp_comment            - in a C++ comment, i.e. from immediately after "//"
+    # - :dq_string              - within a double-quoted string
+    # - :dq_string_escape       - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
+    # - :raw_string             - within a C++ raw string
+    # - :raw_string_closing     - waiting for the final '"' in a C++ raw string
+    # - :backtick_string        - within a Go raw string
+    # - :backtick_string_open   - waiting for the opening '`' in a Go raw string
+    # - :lifetime               - within a Rust lifetime name
+    # - :verbatim_string        - within a C# verbatim string
+    # - :verbatim_string_open   - waiting for the opening '"' in a C# verbatim string
+    # - :verbatim_string_quote  - waiting to determine whether a C# quote is doubled
+    # - :slash_start            - having found a slash (not in a string)
+    # - :sq_string_closing      - waiting for final '\'' in a single-quoted string
+    # - :sq_string_escape       - within a escaped single-quoted string, i.e. from immediately after "'\"
+    # - :sq_string_open         - within a single-quoted string, i.e. from immediately after "'"
+    # - :text                   - regular part of the code
 
     state   =   :text
 
-    r       =   ''
+    r       =   String.new
+    r.force_encoding input.encoding
 
     cc_lines =   0
+    previous_was_cr = false
 
-    input.each_char do |c|
+    i = 0
+    while i < input.length
+      c = input[i]
+
+      if ?\\ == c
+        next_c = input[i + 1]
+
+        if ?\n == next_c
+          i += 2
+          previous_was_cr = false
+          next
+        elsif ?\r == next_c
+          i += 2
+          previous_was_cr = false
+
+          if ?\n == input[i]
+            i += 1
+            next
+          end
+
+          next if i >= input.length
+
+          c = input[i]
+        end
+      end
 
       case c
       when ?\r, ?\n
 
-        line += 1
+        line += 1 unless ?\n == c && previous_was_cr
         column = 0
       else
 
@@ -88,13 +123,29 @@ module C
 
       skip = false
 
+      if :text == state &&
+         'R' == c && '"' == input[i + 1] && '(' == input[i + 2]
+        state = :raw_string
+      elsif :text == state &&
+            '@' == c && '"' == input[i + 1]
+        state = :verbatim_string_open
+      elsif :text == state &&
+            i > 0 &&
+            '<' == input[i - 1] &&
+            input[i + 1] &&
+            input[i + 1] >= ?a && input[i + 1] <= ?z
+        state = :lifetime
+      elsif :text == state && '`' == c
+        state = :backtick_string_open
+      end
+
       case c
       when ?\r, ?\n
 
         case state
         when :c_comment, :c_comment_star
 
-          cc_lines += 1
+          cc_lines += 1 unless ?\n == c && previous_was_cr
 
           state = :c_comment
         when :cpp_comment
@@ -121,6 +172,42 @@ module C
         # - for comment-star
 
         case state
+        when :backtick_string_open
+
+          state = :backtick_string if '`' == c
+        when :backtick_string
+
+          state = :text if '`' == c
+        when :lifetime
+
+          if !((?a <= c && c <= ?z) || (?A <= c && c <= ?Z) ||
+                (?0 <= c && c <= ?9) || '_' == c)
+            state = :text
+          elsif !input[i + 1] ||
+                !((?a <= input[i + 1] && input[i + 1] <= ?z) ||
+                  (?A <= input[i + 1] && input[i + 1] <= ?Z) ||
+                  (?0 <= input[i + 1] && input[i + 1] <= ?9) ||
+                  '_' == input[i + 1])
+            state = :text
+          end
+        when :verbatim_string_open
+
+          state = :verbatim_string if '"' == c
+        when :verbatim_string
+
+          if '"' == c
+            state = :verbatim_string_quote if '"' == input[i + 1]
+            state = :text unless '"' == input[i + 1]
+          end
+        when :verbatim_string_quote
+
+          state = :verbatim_string if '"' == c
+        when :raw_string
+
+          state = :raw_string_closing if ')' == c && '"' == input[i + 1]
+        when :raw_string_closing
+
+          state = :text if '"' == c
         when :sq_string_open
 
           state = (?\\ == c) ? :sq_string_escape : :sq_string_closing
@@ -195,7 +282,13 @@ module C
               case state
               when :text
 
-                state = :sq_string_open
+                if i > 0 && input[i + 1] &&
+                   input[i - 1] >= ?0 && input[i - 1] <= ?9 &&
+                   input[i + 1] >= ?0 && input[i + 1] <= ?9
+                  ;
+                else
+                  state = :sq_string_open
+                end
               when :sq_string_closing
 
                 state = :text
@@ -259,7 +352,13 @@ module C
 
         r << c unless skip
       end
+
+      previous_was_cr = ?\r == c
+      i += 1
     end
+
+    r << '/' if :slash_start == state
+    r << ?\n * cc_lines if [ :c_comment, :c_comment_star, ].include?(state)
 
     r
   end
