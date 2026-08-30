@@ -48,6 +48,23 @@ module LanguageFamilies
 
 module C
 
+  def self.decimal_digit? character
+
+    character && character >= ?0 && character <= ?9
+  end
+
+  def self.identifier_character? character
+
+    return false unless character
+
+    case character
+    when ?a..?z, ?A..?Z, ?0..?9, '_'
+      true
+    else
+      false
+    end
+  end
+
   def self.strip input, lf, **options
 
     return input if input.nil?
@@ -123,17 +140,11 @@ module C
 
       skip = false
 
-      if :text == state &&
-         'R' == c && '"' == input[i + 1] && '(' == input[i + 2]
+      if :text == state && 'R' == c && '"' == input[i + 1] && '(' == input[i + 2]
         state = :raw_string
-      elsif :text == state &&
-            '@' == c && '"' == input[i + 1]
+      elsif :text == state && '@' == c && '"' == input[i + 1]
         state = :verbatim_string_open
-      elsif :text == state &&
-            i > 0 &&
-            '<' == input[i - 1] &&
-            input[i + 1] &&
-            input[i + 1] >= ?a && input[i + 1] <= ?z
+      elsif :text == state && i > 0 && '<' == input[i - 1] && input[i + 1] && input[i + 1] >= ?a && input[i + 1] <= ?z
         state = :lifetime
       elsif :text == state && '`' == c
         state = :backtick_string_open
@@ -180,14 +191,9 @@ module C
           state = :text if '`' == c
         when :lifetime
 
-          if !((?a <= c && c <= ?z) || (?A <= c && c <= ?Z) ||
-                (?0 <= c && c <= ?9) || '_' == c)
+          if !identifier_character?(c)
             state = :text
-          elsif !input[i + 1] ||
-                !((?a <= input[i + 1] && input[i + 1] <= ?z) ||
-                  (?A <= input[i + 1] && input[i + 1] <= ?Z) ||
-                  (?0 <= input[i + 1] && input[i + 1] <= ?9) ||
-                  '_' == input[i + 1])
+          elsif !identifier_character?(input[i + 1])
             state = :text
           end
         when :verbatim_string_open
@@ -282,9 +288,7 @@ module C
               case state
               when :text
 
-                if i > 0 && input[i + 1] &&
-                   input[i - 1] >= ?0 && input[i - 1] <= ?9 &&
-                   input[i + 1] >= ?0 && input[i + 1] <= ?9
+                if i > 0 && decimal_digit?(input[i - 1]) && decimal_digit?(input[i + 1])
                   ;
                 else
                   state = :sq_string_open

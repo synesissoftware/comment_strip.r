@@ -49,6 +49,18 @@ module LanguageFamilies
 
 module HashLine
 
+  def self.identifier_character? character
+
+    return false unless character
+
+    case character
+    when ?a..?z, ?A..?Z, ?0..?9, '_'
+      true
+    else
+      false
+    end
+  end
+
   def self.strip input, lf, **options
 
     return input if input.nil?
@@ -105,24 +117,16 @@ module HashLine
       if :text == state && '<' == c && '<' == input[i + 1]
         heredoc_offset = i + 2
         heredoc_offset += 1 if '~' == input[heredoc_offset]
-        heredoc_quote = input[heredoc_offset] if
-          [ '\'', '"', ].include?(input[heredoc_offset])
+        heredoc_quote = input[heredoc_offset]
+        heredoc_quote = nil unless [ '\'', '"', ].include?(heredoc_quote)
         heredoc_offset += 1 if [ '\'', '"', ].include?(heredoc_quote)
         heredoc_start = heredoc_offset
 
-        while heredoc_offset < input.length &&
-              ((?a <= input[heredoc_offset] &&
-                input[heredoc_offset] <= ?z) ||
-               (?A <= input[heredoc_offset] &&
-                input[heredoc_offset] <= ?Z) ||
-               (?0 <= input[heredoc_offset] &&
-                input[heredoc_offset] <= ?9) ||
-               '_' == input[heredoc_offset])
+        while heredoc_offset < input.length && identifier_character?(input[heredoc_offset])
           heredoc_offset += 1
         end
 
-        if heredoc_start < heredoc_offset &&
-           (!heredoc_quote || heredoc_quote == input[heredoc_offset])
+        if heredoc_start < heredoc_offset && (!heredoc_quote || heredoc_quote == input[heredoc_offset])
           heredoc_terminator = input[heredoc_start...heredoc_offset]
           state = :heredoc_header
         end
@@ -177,10 +181,7 @@ module HashLine
               heredoc_index += 1
             end
 
-            if heredoc_match &&
-               [ nil, ?\r, ?\n, ].include?(
-                 input[i + heredoc_terminator.length]
-               )
+            if heredoc_match && [ nil, ?\r, ?\n, ].include?(input[i + heredoc_terminator.length])
               state = :text
             end
           end

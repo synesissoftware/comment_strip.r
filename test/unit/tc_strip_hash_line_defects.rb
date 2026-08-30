@@ -139,12 +139,13 @@ a # not comment
 TXT
 x = 1 # real
 EOF
-    expected = <<-EOF
-s = <<~'TXT'
-a # not comment
-TXT
-x = 1 
-EOF
+    expected = [
+      "s = <<~'TXT'\n",
+      "a # not comment\n",
+      "TXT\n",
+      "x = 1 ",
+      "\n",
+    ].join
 
     assert_equal expected, strip(input, :Hash_Line)
   end
