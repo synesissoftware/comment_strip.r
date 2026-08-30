@@ -25,18 +25,10 @@
 
 ## Maintenance improvements
 
-* [ ] move code extracts, including those containing deliberate trailing
-  whitespace, to fixture files or preprocess special string fragments such
-  as `"\1SPACE\2"` and `"\1TAB\2"` before using them in tests;
-* [ ] perform a full manual code review of the changes, especially to
-  identify parts that could be simplified with helper functions or could
-  permit regular expressions after entering a complex state such as a
-  heredoc;
-* [ ] separate general-purpose C-family and hash-family handling from
-  language-specific handling, so C++ parsing does not apply C# `@`-strings
-  and other languages' syntax unintentionally;
-* [ ] add liberal explanatory comments to specific complex parts of the
-  parsing code, especially state transitions and delimiter handling;
+* [ ] move code extracts, including those containing deliberate trailing whitespace, to fixture files or preprocess special string fragments such as `"\1SPACE\2"` and `"\1TAB\2"` before using them in tests;
+* [ ] perform a full manual code review of the changes, especially to identify parts that could be simplified with helper functions or could permit regular expressions after entering a complex state such as a heredoc;
+* [ ] separate general-purpose C-family and hash-family handling from language-specific handling, so C++ parsing does not apply C# `@`-strings and other languages' syntax unintentionally;
+* [ ] add liberal explanatory comments to specific complex parts of the parsing code, especially state transitions and delimiter handling;
 
 
 ## Performance improvements
