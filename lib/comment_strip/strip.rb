@@ -91,7 +91,7 @@ module CommentStrip
             LanguageFamilies::HashLine.strip input, lf, **options
         else
 
-            raise "language family '#{lf}' unrecognised or not supported1"
+            raise "language family '#{lf}' unrecognised or not supported"
         end
     end
 
