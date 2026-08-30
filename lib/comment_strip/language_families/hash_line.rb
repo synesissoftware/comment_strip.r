@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # ######################################################################## #
 # File:     comment_strip/language_families/hash_line.rb
 #
@@ -5,11 +6,11 @@
 #           line comments beginning at the # character.
 #
 # Created:  1st December 2023
-# Updated:  31st March 2024
+# Updated:  19th August 2026
 #
-# Home:     http://github.com/synesissoftware/comment_strip.r
+# Home:     https://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2023-2024, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2023-2026, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -68,7 +69,7 @@ module HashLine
 
     state   =   :text
 
-    r       =   ''
+    r       =   String.new
 
     cc_lines =   0
 
