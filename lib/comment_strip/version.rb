@@ -5,11 +5,11 @@
 # Purpose:  Version for comment_strip.r library
 #
 # Created:  14th September 2020
-# Updated:  15th August 2026
+# Updated:  19th August 2026
 #
-# Home:     http://github.com/synesissoftware/comment_strip.r
+# Home:     https://github.com/synesissoftware/comment_strip.r
 #
-# Copyright (c) 2020-2024, Matthew Wilson and Synesis Information Systems
+# Copyright (c) 2020-2026, Matthew Wilson and Synesis Information Systems
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@
 module CommentStrip
 
     # Current version of the comment_strip.r library
-    VERSION                 =   '0.2.0.1'
+    VERSION                 =   '0.2.1'
 
     private
     VERSION_PARTS_          =   VERSION.split(/[.]/).collect { |n| n.to_i } # :nodoc:
