@@ -5,7 +5,7 @@
 # Purpose:  Version for comment_strip.r library
 #
 # Created:  14th September 2020
-# Updated:  19th August 2026
+# Updated:  30th August 2026
 #
 # Home:     https://github.com/synesissoftware/comment_strip.r
 #

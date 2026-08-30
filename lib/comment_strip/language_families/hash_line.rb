@@ -6,7 +6,7 @@
 #           line comments beginning at the # character.
 #
 # Created:  1st December 2023
-# Updated:  19th August 2026
+# Updated:  30th August 2026
 #
 # Home:     https://github.com/synesissoftware/comment_strip.r
 #
@@ -49,6 +49,18 @@ module LanguageFamilies
 
 module HashLine
 
+  def self.identifier_character? character
+
+    return false unless character
+
+    case character
+    when ?a..?z, ?A..?Z, ?0..?9, '_'
+      true
+    else
+      false
+    end
+  end
+
   def self.strip input, lf, **options
 
     return input if input.nil?
@@ -59,21 +71,66 @@ module HashLine
 
     # States:
     #
-    # - :dq_string          - within a double-quoted string
-    # - :dq_string_escape   - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
-    # - :hash_comment       - in a #-comment, i.e. from immediately after "#"
-    # - :sq_string_closing  - waiting for final '\'' in a single-quoted string
-    # - :sq_string_escape   - within a escaped single-quoted string, i.e. from immediately after "'\"
-    # - :sq_string_open     - within a single-quoted string, i.e. from immediately after "'"
-    # - :text               - regular part of the code
+    # - :dq_string            - within a double-quoted string
+    # - :dq_string_escape     - within a double-quoted string when just received a '"', e.g. from immediately after '"the next word is quoted \'
+    # - :hash_comment         - in a #-comment, i.e. from immediately after "#"
+    # - :heredoc_body         - within a Ruby heredoc body
+    # - :heredoc_header       - within a Ruby heredoc header
+    # - :percent_string       - within a Ruby percent string
+    # - :percent_string_open  - waiting for the opening delimiter of a Ruby percent string
+    # - :sq_string_closing    - waiting for final '\'' in a single-quoted string
+    # - :sq_string_escape     - within a escaped single-quoted string, i.e. from immediately after "'\"
+    # - :sq_string_open       - within a single-quoted string, i.e. from immediately after "'"
+    # - :text                 - regular part of the code
 
     state   =   :text
 
     r       =   String.new
+    r.force_encoding input.encoding
 
-    cc_lines =   0
+    percent_open = nil
+    percent_closing = nil
+    heredoc_terminator = nil
+    at_line_start = true
 
-    input.each_char do |c|
+    i = 0
+    while i < input.length
+      c = input[i]
+      percent_start = false
+
+      if :text == state && '%' == c
+        percent_type = input[i + 1]
+        percent_delimiter = input[i + 2]
+
+        if [ 'q', 'w', ].include?(percent_type) && percent_delimiter
+          percent_open = percent_delimiter
+          percent_closing = case percent_delimiter
+                            when '{' then '}'
+                            when '[' then ']'
+                            when '(' then ')'
+                            else percent_open
+                            end
+          percent_start = true
+        end
+      end
+
+      if :text == state && '<' == c && '<' == input[i + 1]
+        heredoc_offset = i + 2
+        heredoc_offset += 1 if '~' == input[heredoc_offset]
+        heredoc_quote = input[heredoc_offset]
+        heredoc_quote = nil unless [ '\'', '"', ].include?(heredoc_quote)
+        heredoc_offset += 1 if [ '\'', '"', ].include?(heredoc_quote)
+        heredoc_start = heredoc_offset
+
+        while heredoc_offset < input.length && identifier_character?(input[heredoc_offset])
+          heredoc_offset += 1
+        end
+
+        if heredoc_start < heredoc_offset && (!heredoc_quote || heredoc_quote == input[heredoc_offset])
+          heredoc_terminator = input[heredoc_start...heredoc_offset]
+          state = :heredoc_header
+        end
+      end
 
       case c
       when ?\r, ?\n
@@ -100,9 +157,9 @@ module HashLine
         when :dq_string_escape
 
           state = :dq_string
-        when :hash_comment
+        when :heredoc_header
 
-          state = :text
+          state = :heredoc_body
         end
       else
 
@@ -112,12 +169,39 @@ module HashLine
         # - for slash-start
 
         case state
+        when :heredoc_body
+
+          if at_line_start
+            heredoc_match = true
+            heredoc_index = 0
+
+            while heredoc_index < heredoc_terminator.length
+              heredoc_match = false unless input[i + heredoc_index] ==
+                                            heredoc_terminator[heredoc_index]
+              heredoc_index += 1
+            end
+
+            if heredoc_match && [ nil, ?\r, ?\n, ].include?(input[i + heredoc_terminator.length])
+              state = :text
+            end
+          end
+        when :percent_string_open
+
+          state = :percent_string if c == percent_open
+        when :percent_string
+
+          state = :text if c == percent_closing
         when :sq_string_open
 
-          state = (?\\ == c) ? :sq_string_escape : :sq_string_closing
+          case c
+          when ?\\
+            state = :sq_string_escape
+          when ?\'
+            state = :text
+          end
         when :sq_string_escape
 
-          state = :sq_string_closing
+          state = :sq_string_open
         when :dq_string_escape
 
           state = :dq_string
@@ -140,9 +224,6 @@ module HashLine
             when :text
 
               state = :sq_string_open
-            when :sq_string_closing
-
-              state = :text
             else
 
               ;
@@ -199,6 +280,10 @@ module HashLine
 
         r << c unless skip
       end
+
+      state = :percent_string_open if percent_start
+      at_line_start = ?\r == c || ?\n == c
+      i += 1
     end
 
     r
